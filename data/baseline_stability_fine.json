@@ -1,0 +1,79 @@
+{
+  "span_days": 1499.7720826399943,
+  "timestep_days": 0.00175207019,
+  "steps_per_inner_orbit": 4000,
+  "eccentricity_mode": "adopted circular",
+  "contains_synthetic_body": false,
+  "planets": {
+    "b": {
+      "a_initial": 0.07416282054336842,
+      "a_fractional_range": 0.0006760957465377256,
+      "e_max": 0.004172892556683369,
+      "period_measured_mean": 7.00831832662357,
+      "period_catalogue": 7.00828076
+    },
+    "c": {
+      "a_initial": 0.0857949068294351,
+      "a_fractional_range": 0.00046026481838957296,
+      "e_max": 0.0028256257501309574,
+      "period_measured_mean": 8.719989095343749,
+      "period_catalogue": 8.71982853
+    },
+    "i": {
+      "a_initial": 0.12013116625935392,
+      "a_fractional_range": 0.00013825559951774098,
+      "e_max": 0.0002445085646749508,
+      "period_measured_mean": 14.449318344853266,
+      "period_catalogue": 14.44912
+    },
+    "d": {
+      "a_initial": 0.30946078773819363,
+      "a_fractional_range": 0.0003981493374503066,
+      "e_max": 0.0010949051976912615,
+      "period_measured_mean": 59.735611687456675,
+      "period_catalogue": 59.7370348
+    },
+    "e": {
+      "a_initial": 0.4125714843585348,
+      "a_fractional_range": 0.0009178604079480901,
+      "e_max": 0.0026415851961685255,
+      "period_measured_mean": 91.9076445070218,
+      "period_catalogue": 91.9404603
+    },
+    "f": {
+      "a_initial": 0.5059940322041923,
+      "a_fractional_range": 0.001240975473733246,
+      "e_max": 0.002650560677118919,
+      "period_measured_mean": 124.90252387153407,
+      "period_catalogue": 124.916337
+    },
+    "g": {
+      "a_initial": 0.7172607974173464,
+      "a_fractional_range": 0.00603611551435316,
+      "e_max": 0.014803973303854256,
+      "period_measured_mean": 209.8740353407163,
+      "period_catalogue": 210.6031105
+    },
+    "h": {
+      "a_initial": 0.9703163175166765,
+      "a_fractional_range": 0.0007154706290432871,
+      "e_max": 0.0013711314372854074,
+      "period_measured_mean": 331.5280583055941,
+      "period_catalogue": 331.6011081
+    }
+  },
+  "hill_separations": {
+    "b-c": 7.957296300194241,
+    "c-i": 18.10674956985138,
+    "i-d": 42.24639316618499,
+    "d-e": 12.337237543058919,
+    "e-f": 8.834593982483584,
+    "f-g": 12.763045580375136,
+    "g-h": 5.1543628970407065
+  },
+  "min_separation_au": 0.011411618177503498,
+  "max_energy_error": 6.72905195627223e-10,
+  "max_angular_momentum_error": 1.6811310195971522e-13,
+  "max_momentum_error": 9.981396295668664e-19,
+  "stable": false
+}

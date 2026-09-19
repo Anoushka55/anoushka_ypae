@@ -1,0 +1,205 @@
+"""
+Units and physical constants — the single source of truth for this project.
+
+Phase 2 deliverable. NO physical constant may be defined anywhere else in the
+codebase. If you need a constant, import it from here.
+
+================================================================================
+CHOSEN UNIT SYSTEM:   length = au      time = day      mass = M_sun
+================================================================================
+
+The justification, and the comparison against the alternatives, is in docs/UNITS.md.
+The short version:
+
+  * The scientific OBSERVABLE of this project is a transit time, quoted in days
+    (BJD). Making the day the time unit means the quantity we measure is the
+    integration variable itself — no scaling multiplies into the timing residuals
+    we are trying to resolve at the level of seconds.
+  * Distances in au and the stellar mass in M_sun are both of order unity for
+    Kepler-90 (a = 0.074 ... 0.970 au, M* = 1.108 M_sun), which keeps every
+    intermediate product well inside the comfortable range of f64.
+  * Planet masses are small in these units (8e-6 ... 6e-4 M_sun) but that is
+    harmless: they enter linearly, never as a divisor.
+
+CRITICAL NUMERICAL NOTE
+-----------------------
+G*M_sun is NOT taken to be 4*pi^2 au^3/yr^2. That identity is only approximate
+(it assumes a body orbiting at exactly 1 au with a period of exactly 1 Julian
+year). The true value differs by ~4e-5 in relative terms, which over the
+~1500-day Kepler baseline is a coherent timing error far larger than the
+transit-timing signals this project exists to measure. We therefore derive
+G*M_sun from the IAU 2015 nominal solar mass parameter and verify it against the
+classical Gaussian gravitational constant in the test suite.
+"""
+
+from __future__ import annotations
+
+import math
+
+# =============================================================================
+# SOURCE CONSTANTS  (nothing below this block is typed in by hand)
+# =============================================================================
+
+# --- IAU 2015 Resolution B3, nominal values ---------------------------------
+# https://www.iau.org/static/resolutions/IAU2015_English.pdf
+GM_SUN_SI = 1.3271244e20      # m^3 s^-2   nominal solar mass parameter
+GM_EARTH_SI = 3.986004e14     # m^3 s^-2   nominal terrestrial mass parameter
+GM_JUPITER_SI = 1.2668653e17  # m^3 s^-2   nominal jovian mass parameter
+R_SUN_SI = 6.957e8            # m          nominal solar radius
+R_EARTH_EQ_SI = 6.3781e6      # m          nominal Earth equatorial radius
+R_JUPITER_EQ_SI = 7.1492e7    # m          nominal Jupiter equatorial radius
+
+# --- IAU 2012 Resolution B2: the astronomical unit is DEFINED, exactly ------
+AU_SI = 1.495978707e11        # m (exact by definition)
+
+# --- Exact time definitions --------------------------------------------------
+DAY_SI = 86400.0              # s (exact)
+YEAR_JULIAN_SI = 365.25 * DAY_SI  # s (exact)
+
+# --- CODATA 2018 -------------------------------------------------------------
+# Only needed to convert a mass PARAMETER (GM) into a mass. G is the least
+# precisely known constant in physics; note that GM products are known to ~1e-10
+# relative precision while G itself is known only to ~2e-5. This is exactly why
+# we work with GM throughout and never with G and M separately.
+G_SI = 6.67430e-11            # m^3 kg^-1 s^-2
+
+# =============================================================================
+# DERIVED CONSTANTS IN THE SIMULATION UNIT SYSTEM  (au, day, M_sun)
+# =============================================================================
+
+def _si_gm_to_au3_per_day2(gm_si: float) -> float:
+    """Convert a gravitational parameter GM from m^3/s^2 to au^3/day^2."""
+    return gm_si * DAY_SI**2 / AU_SI**3
+
+
+#: G expressed in au^3 / (M_sun day^2). Because mass is measured in M_sun, this
+#: is numerically identical to G*M_sun in au^3/day^2.
+#: Equals the square of the Gaussian gravitational constant k = 0.01720209895.
+G = _si_gm_to_au3_per_day2(GM_SUN_SI)
+
+#: Classical Gaussian gravitational constant, for cross-validation in tests.
+GAUSS_K = 0.01720209895  # au^(3/2) day^-1 M_sun^(-1/2)
+
+# --- mass ratios -------------------------------------------------------------
+#: Earth mass in solar masses. Formed from the GM ratio so that the poorly known
+#: value of G cancels exactly.
+EARTH_MASS_IN_SOLAR = GM_EARTH_SI / GM_SUN_SI
+JUPITER_MASS_IN_SOLAR = GM_JUPITER_SI / GM_SUN_SI
+EARTH_MASS_IN_JUPITER = GM_EARTH_SI / GM_JUPITER_SI
+
+# --- lengths -----------------------------------------------------------------
+R_SUN_IN_AU = R_SUN_SI / AU_SI
+R_EARTH_IN_AU = R_EARTH_EQ_SI / AU_SI
+R_JUPITER_IN_AU = R_JUPITER_EQ_SI / AU_SI
+
+# --- time --------------------------------------------------------------------
+MINUTES_PER_DAY = 1440.0
+SECONDS_PER_DAY = DAY_SI
+DAYS_PER_YEAR_JULIAN = 365.25
+
+
+def days_to_minutes(d: float) -> float:
+    return d * MINUTES_PER_DAY
+
+
+def days_to_seconds(d: float) -> float:
+    return d * SECONDS_PER_DAY
+
+
+def minutes_to_days(m: float) -> float:
+    return m / MINUTES_PER_DAY
+
+
+def seconds_to_days(s: float) -> float:
+    return s / SECONDS_PER_DAY
+
+
+def earth_masses_to_solar(m_earth: float) -> float:
+    return m_earth * EARTH_MASS_IN_SOLAR
+
+
+def solar_masses_to_earth(m_solar: float) -> float:
+    return m_solar / EARTH_MASS_IN_SOLAR
+
+
+def solar_radii_to_au(r_solar: float) -> float:
+    return r_solar * R_SUN_IN_AU
+
+
+def earth_radii_to_au(r_earth: float) -> float:
+    return r_earth * R_EARTH_IN_AU
+
+
+# =============================================================================
+# KEPLERIAN HELPERS  (unit-system aware; used for initial conditions and tests)
+# =============================================================================
+
+def kepler_third_law_period(semi_major_axis_au: float, total_mass_solar: float) -> float:
+    """Orbital period [days] from semi-major axis [au] and total system mass [M_sun].
+
+        P = 2*pi * sqrt(a^3 / (G * M_total))
+    """
+    return 2.0 * math.pi * math.sqrt(semi_major_axis_au**3 / (G * total_mass_solar))
+
+
+def kepler_third_law_axis(period_days: float, total_mass_solar: float) -> float:
+    """Semi-major axis [au] from period [days] and total system mass [M_sun].
+
+        a = (G * M_total * P^2 / (4*pi^2))^(1/3)
+    """
+    return (G * total_mass_solar * period_days**2 / (4.0 * math.pi**2)) ** (1.0 / 3.0)
+
+
+def circular_speed(semi_major_axis_au: float, total_mass_solar: float) -> float:
+    """Circular orbital speed [au/day]:  v = sqrt(G*M/a)."""
+    return math.sqrt(G * total_mass_solar / semi_major_axis_au)
+
+
+def vis_viva_speed(r_au: float, semi_major_axis_au: float, total_mass_solar: float) -> float:
+    """Orbital speed [au/day] at radius r from the vis-viva equation:
+
+        v^2 = G*M * (2/r - 1/a)
+    """
+    return math.sqrt(G * total_mass_solar * (2.0 / r_au - 1.0 / semi_major_axis_au))
+
+
+# =============================================================================
+# NUMERICAL POLICY
+# =============================================================================
+
+#: All physics MUST run in double precision. See docs/ARCHITECTURE.md §3.1:
+#: f32 resolves time to only ~86 s at t ~ 1e4 days, which is the same order as
+#: the transit-timing signals being measured, and would manufacture spurious
+#: "TTVs" that are indistinguishable from physical ones.
+REQUIRED_FLOAT_PRECISION_BITS = 64
+
+
+if __name__ == "__main__":
+    # Representative magnitudes for Kepler-90 in the chosen unit system.
+    # (Phase 2 asks for these explicitly; values pulled live from the dataset.)
+    import json
+    from pathlib import Path
+
+    ref_path = Path(__file__).resolve().parents[1] / "data" / "kepler90_reference.json"
+    ref = json.loads(ref_path.read_text(encoding="utf-8"))
+    m_star = ref["star"]["mass_solar"]["value"]
+
+    print("UNIT SYSTEM: length = au, time = day, mass = M_sun")
+    print(f"  G                 = {G:.12e} au^3 / (M_sun day^2)")
+    print(f"  Gauss k^2         = {GAUSS_K**2:.12e}  (cross-check)")
+    print(f"  relative diff     = {abs(G - GAUSS_K**2) / G:.3e}")
+    print(f"  4*pi^2 au^3/yr^2 in au^3/day^2 = "
+          f"{4 * math.pi**2 / DAYS_PER_YEAR_JULIAN**2:.12e}  <-- NOT used")
+    print(f"  relative error if 4pi^2 were used: "
+          f"{abs(4 * math.pi**2 / DAYS_PER_YEAR_JULIAN**2 - G) / G:.3e}")
+    print(f"  M_earth / M_sun   = {EARTH_MASS_IN_SOLAR:.6e}")
+    print(f"  R_sun  [au]       = {R_SUN_IN_AU:.6e}")
+    print()
+    print(f"  M* = {m_star} M_sun")
+    print(f"{'planet':>7} {'m [M_sun]':>12} {'a [au]':>9} {'P [day]':>11} "
+          f"{'v_circ [au/d]':>13} {'accel [au/d^2]':>15}")
+    for letter, p in ref["planets"].items():
+        m = p["mass_earth"]["value"] * EARTH_MASS_IN_SOLAR
+        a = p["semi_major_axis_au"]["value"]
+        print(f"{letter:>7} {m:12.4e} {a:9.5f} {p['orbital_period_days']['value']:11.5f} "
+              f"{circular_speed(a, m_star):13.6f} {G * m_star / a**2:15.6e}")

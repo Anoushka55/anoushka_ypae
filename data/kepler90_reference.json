@@ -1,0 +1,850 @@
+{
+  "schema_version": "1.0",
+  "system": "Kepler-90 (KOI-351, KIC 11442793)",
+  "generated_utc": "2026-09-19T06:50:14+00:00",
+  "generated_by": "scripts/build_reference_dataset.py",
+  "archive_snapshot": "data/raw/kepler90_ps_full_snapshot.csv",
+  "archive_access_utc": "2026-09-19T06:03:26Z",
+  "warning": "This dataset describes the REAL Kepler-90 system only. It contains no synthetic body. Planet X is defined separately and is not part of this file.",
+  "star": {
+    "name": "Kepler-90",
+    "aliases": [
+      "KOI-351",
+      "KIC 11442793",
+      "2MASS J18574403+4918185"
+    ],
+    "mass_solar": {
+      "value": 1.108,
+      "uncertainty": 0.035,
+      "unit": "M_sun",
+      "status": "observed",
+      "source": "FULTON__AMP__PETIGURA_2018"
+    },
+    "radius_solar": {
+      "value": 1.185,
+      "uncertainty": 0.031,
+      "unit": "R_sun",
+      "status": "observed",
+      "source": "FULTON__AMP__PETIGURA_2018"
+    },
+    "teff_k": {
+      "value": 6015.0,
+      "unit": "K",
+      "status": "observed",
+      "source": "FULTON__AMP__PETIGURA_2018"
+    }
+  },
+  "planets": {
+    "b": {
+      "letter": "b",
+      "name": "Kepler-90 b",
+      "orbital_period_days": {
+        "value": 7.00828076,
+        "uncertainty": null,
+        "unit": "days",
+        "status": "observed",
+        "source": "WEISS_ET_AL__2024"
+      },
+      "semi_major_axis_au": {
+        "value": 0.0741641627,
+        "unit": "au",
+        "status": "derived",
+        "source": "WEISS_ET_AL__2024",
+        "notes": "Consistent with Kepler's third law at M* = 1.108 M_sun (verified below).",
+        "kepler_third_law_check_au": 0.0741632289555441,
+        "kepler_third_law_rel_diff": 1.259023795187182e-05
+      },
+      "eccentricity": {
+        "value": 0.0,
+        "uncertainty": null,
+        "unit": "dimensionless",
+        "status": "adopted-model",
+        "source": "WEISS_ET_AL__2024",
+        "notes": "Circular orbit assumed; Weiss et al. 2024 fix e = 0 with no uncertainty."
+      },
+      "inclination_deg": {
+        "value": 89.4,
+        "uncertainty": 1.5,
+        "unit": "deg",
+        "status": "observed",
+        "source": "CABRERA_ET_AL__2014",
+        "notes": "Published inclination. For transit geometry prefer `impact_parameter`, which is the directly measured transit-shape observable; see CHECK 5.",
+        "derived_from_impact_parameter_deg": 89.44653064096711
+      },
+      "impact_parameter": {
+        "value": 0.13,
+        "unit": "stellar radii",
+        "status": "observed",
+        "source": "CABRERA_ET_AL__2014",
+        "notes": "b = a cos(i) / R_star. This is what the transit light-curve shape actually constrains; the inclination is a derived restatement of it that depends on the adopted a and R_star.",
+        "consistency_with_published_inclination": "consistent"
+      },
+      "transit_epoch_bjd": {
+        "value": 2454970.6906,
+        "uncertainty": 0.0017,
+        "unit": "BJD_TDB",
+        "status": "observed",
+        "source": "CABRERA_ET_AL__2014",
+        "notes": "Sets the orbital phase of the initial condition."
+      },
+      "planet_radius_earth": {
+        "value": 1.3,
+        "uncertainty": 0.065,
+        "unit": "R_earth",
+        "status": "observed",
+        "source": "WEISS_ET_AL__2024"
+      },
+      "mass_earth": {
+        "value": 2.7335449007321295,
+        "uncertainty": 1.3667724503660648,
+        "unit": "M_earth",
+        "status": "derived",
+        "method": "Weiss & Marcy (2014) mass-radius relation, density (R < 1.5 R_earth)",
+        "source": "WEISS__AMP__MARCY_2014",
+        "notes": "NO PUBLISHED MASS EXISTS for this planet. This value is model-dependent with large intrinsic scatter (published RMS 4.3 M_earth, reduced chi^2 6.2) and must never be presented as a measurement."
+      }
+    },
+    "c": {
+      "letter": "c",
+      "name": "Kepler-90 c",
+      "orbital_period_days": {
+        "value": 8.71982853,
+        "uncertainty": null,
+        "unit": "days",
+        "status": "observed",
+        "source": "WEISS_ET_AL__2024"
+      },
+      "semi_major_axis_au": {
+        "value": 0.0857942931,
+        "unit": "au",
+        "status": "derived",
+        "source": "WEISS_ET_AL__2024",
+        "notes": "Consistent with Kepler's third law at M* = 1.108 M_sun (verified below).",
+        "kepler_third_law_check_au": 0.08579321288402338,
+        "kepler_third_law_rel_diff": 1.2590767259623213e-05
+      },
+      "eccentricity": {
+        "value": 0.0,
+        "uncertainty": null,
+        "unit": "dimensionless",
+        "status": "adopted-model",
+        "source": "WEISS_ET_AL__2024",
+        "notes": "Circular orbit assumed; Weiss et al. 2024 fix e = 0 with no uncertainty."
+      },
+      "inclination_deg": {
+        "value": 89.68,
+        "uncertainty": 0.74,
+        "unit": "deg",
+        "status": "observed",
+        "source": "CABRERA_ET_AL__2014",
+        "notes": "Published inclination. For transit geometry prefer `impact_parameter`, which is the directly measured transit-shape observable; see CHECK 5.",
+        "derived_from_impact_parameter_deg": 89.66877424227268
+      },
+      "impact_parameter": {
+        "value": 0.09,
+        "unit": "stellar radii",
+        "status": "observed",
+        "source": "CABRERA_ET_AL__2014",
+        "notes": "b = a cos(i) / R_star. This is what the transit light-curve shape actually constrains; the inclination is a derived restatement of it that depends on the adopted a and R_star.",
+        "consistency_with_published_inclination": "consistent"
+      },
+      "transit_epoch_bjd": {
+        "value": 2454972.5687,
+        "uncertainty": 0.0023,
+        "unit": "BJD_TDB",
+        "status": "observed",
+        "source": "CABRERA_ET_AL__2014",
+        "notes": "Sets the orbital phase of the initial condition."
+      },
+      "planet_radius_earth": {
+        "value": 1.445,
+        "uncertainty": 0.066,
+        "unit": "R_earth",
+        "status": "observed",
+        "source": "WEISS_ET_AL__2024"
+      },
+      "mass_earth": {
+        "value": 4.0239462558780215,
+        "uncertainty": 2.0119731279390107,
+        "unit": "M_earth",
+        "status": "derived",
+        "method": "Weiss & Marcy (2014) mass-radius relation, density (R < 1.5 R_earth)",
+        "source": "WEISS__AMP__MARCY_2014",
+        "notes": "NO PUBLISHED MASS EXISTS for this planet. This value is model-dependent with large intrinsic scatter (published RMS 4.3 M_earth, reduced chi^2 6.2) and must never be presented as a measurement."
+      }
+    },
+    "i": {
+      "letter": "i",
+      "name": "Kepler-90 i",
+      "orbital_period_days": {
+        "value": 14.44912,
+        "uncertainty": null,
+        "unit": "days",
+        "status": "observed",
+        "source": "WEISS_ET_AL__2024"
+      },
+      "semi_major_axis_au": {
+        "value": 0.1201380843,
+        "unit": "au",
+        "status": "derived",
+        "source": "WEISS_ET_AL__2024",
+        "notes": "Consistent with Kepler's third law at M* = 1.108 M_sun (verified below).",
+        "kepler_third_law_check_au": 0.12013657160205238,
+        "kepler_third_law_rel_diff": 1.2591327358342352e-05
+      },
+      "eccentricity": {
+        "value": 0.0,
+        "uncertainty": null,
+        "unit": "dimensionless",
+        "status": "adopted-model",
+        "source": "WEISS_ET_AL__2024",
+        "notes": "Circular orbit assumed; Weiss et al. 2024 fix e = 0 with no uncertainty."
+      },
+      "inclination_deg": {
+        "value": 89.2,
+        "uncertainty": 0.59,
+        "unit": "deg",
+        "status": "observed",
+        "source": "SHALLUE__AMP__VANDERBURG_2018",
+        "notes": "Published inclination. For transit geometry prefer `impact_parameter`, which is the directly measured transit-shape observable; see CHECK 5.",
+        "derived_from_impact_parameter_deg": 88.68578942221586
+      },
+      "impact_parameter": {
+        "value": 0.5,
+        "unit": "stellar radii",
+        "status": "observed",
+        "source": "SHALLUE__AMP__VANDERBURG_2018",
+        "notes": "b = a cos(i) / R_star. This is what the transit light-curve shape actually constrains; the inclination is a derived restatement of it that depends on the adopted a and R_star.",
+        "consistency_with_published_inclination": "discrepant"
+      },
+      "transit_epoch_bjd": {
+        "value": 2455644.3488,
+        "uncertainty": 0.0048,
+        "unit": "BJD_TDB",
+        "status": "observed",
+        "source": "SHALLUE__AMP__VANDERBURG_2018",
+        "notes": "Sets the orbital phase of the initial condition."
+      },
+      "planet_radius_earth": {
+        "value": 1.32,
+        "uncertainty": 0.21,
+        "unit": "R_earth",
+        "status": "observed",
+        "source": "WEISS_ET_AL__2024"
+      },
+      "mass_earth": {
+        "value": 2.890037462079402,
+        "uncertainty": 1.445018731039701,
+        "unit": "M_earth",
+        "status": "derived",
+        "method": "Weiss & Marcy (2014) mass-radius relation, density (R < 1.5 R_earth)",
+        "source": "WEISS__AMP__MARCY_2014",
+        "notes": "NO PUBLISHED MASS EXISTS for this planet. This value is model-dependent with large intrinsic scatter (published RMS 4.3 M_earth, reduced chi^2 6.2) and must never be presented as a measurement."
+      }
+    },
+    "d": {
+      "letter": "d",
+      "name": "Kepler-90 d",
+      "orbital_period_days": {
+        "value": 59.7370348,
+        "uncertainty": null,
+        "unit": "days",
+        "status": "observed",
+        "source": "WEISS_ET_AL__2024"
+      },
+      "semi_major_axis_au": {
+        "value": 0.309467855,
+        "unit": "au",
+        "status": "derived",
+        "source": "WEISS_ET_AL__2024",
+        "notes": "Consistent with Kepler's third law at M* = 1.108 M_sun (verified below).",
+        "kepler_third_law_check_au": 0.3094639584964323,
+        "kepler_third_law_rel_diff": 1.2590979983012384e-05
+      },
+      "eccentricity": {
+        "value": 0.0,
+        "uncertainty": null,
+        "unit": "dimensionless",
+        "status": "adopted-model",
+        "source": "WEISS_ET_AL__2024",
+        "notes": "Circular orbit assumed; Weiss et al. 2024 fix e = 0 with no uncertainty."
+      },
+      "inclination_deg": {
+        "value": 89.71,
+        "uncertainty": 0.29,
+        "unit": "deg",
+        "status": "observed",
+        "source": "CABRERA_ET_AL__2014",
+        "notes": "Published inclination. For transit geometry prefer `impact_parameter`, which is the directly measured transit-shape observable; see CHECK 5.",
+        "derived_from_impact_parameter_deg": 89.71431866926294
+      },
+      "impact_parameter": {
+        "value": 0.28,
+        "unit": "stellar radii",
+        "status": "observed",
+        "source": "CABRERA_ET_AL__2014",
+        "notes": "b = a cos(i) / R_star. This is what the transit light-curve shape actually constrains; the inclination is a derived restatement of it that depends on the adopted a and R_star.",
+        "consistency_with_published_inclination": "consistent"
+      },
+      "transit_epoch_bjd": {
+        "value": 2454991.9656,
+        "uncertainty": 0.0042,
+        "unit": "BJD_TDB",
+        "status": "observed",
+        "source": "CABRERA_ET_AL__2014",
+        "notes": "Sets the orbital phase of the initial condition."
+      },
+      "planet_radius_earth": {
+        "value": 2.866,
+        "uncertainty": 0.094,
+        "unit": "R_earth",
+        "status": "observed",
+        "source": "WEISS_ET_AL__2024"
+      },
+      "mass_earth": {
+        "value": 7.161749609290917,
+        "uncertainty": 4.3,
+        "unit": "M_earth",
+        "status": "derived",
+        "method": "Weiss & Marcy (2014) mass-radius relation, power-law (1.5 <= R <= 4 R_earth)",
+        "source": "WEISS__AMP__MARCY_2014",
+        "notes": "NO PUBLISHED MASS EXISTS for this planet. This value is model-dependent with large intrinsic scatter (published RMS 4.3 M_earth, reduced chi^2 6.2) and must never be presented as a measurement."
+      }
+    },
+    "e": {
+      "letter": "e",
+      "name": "Kepler-90 e",
+      "orbital_period_days": {
+        "value": 91.9404603,
+        "uncertainty": null,
+        "unit": "days",
+        "status": "observed",
+        "source": "WEISS_ET_AL__2024"
+      },
+      "semi_major_axis_au": {
+        "value": 0.412531915,
+        "unit": "au",
+        "status": "derived",
+        "source": "WEISS_ET_AL__2024",
+        "notes": "Consistent with Kepler's third law at M* = 1.108 M_sun (verified below).",
+        "kepler_third_law_check_au": 0.412526720873726,
+        "kepler_third_law_rel_diff": 1.2590847120356563e-05
+      },
+      "eccentricity": {
+        "value": 0.0,
+        "uncertainty": null,
+        "unit": "dimensionless",
+        "status": "adopted-model",
+        "source": "WEISS_ET_AL__2024",
+        "notes": "Circular orbit assumed; Weiss et al. 2024 fix e = 0 with no uncertainty."
+      },
+      "inclination_deg": {
+        "value": 89.79,
+        "uncertainty": 0.19,
+        "unit": "deg",
+        "status": "observed",
+        "source": "CABRERA_ET_AL__2014",
+        "notes": "Published inclination. For transit geometry prefer `impact_parameter`, which is the directly measured transit-shape observable; see CHECK 5.",
+        "derived_from_impact_parameter_deg": 89.79334556645483
+      },
+      "impact_parameter": {
+        "value": 0.27,
+        "unit": "stellar radii",
+        "status": "observed",
+        "source": "CABRERA_ET_AL__2014",
+        "notes": "b = a cos(i) / R_star. This is what the transit light-curve shape actually constrains; the inclination is a derived restatement of it that depends on the adopted a and R_star.",
+        "consistency_with_published_inclination": "consistent"
+      },
+      "transit_epoch_bjd": {
+        "value": 2454967.3127,
+        "uncertainty": 0.0063,
+        "unit": "BJD_TDB",
+        "status": "observed",
+        "source": "CABRERA_ET_AL__2014",
+        "notes": "Sets the orbital phase of the initial condition."
+      },
+      "planet_radius_earth": {
+        "value": 2.612,
+        "uncertainty": 0.094,
+        "unit": "R_earth",
+        "status": "observed",
+        "source": "WEISS_ET_AL__2024"
+      },
+      "mass_earth": {
+        "value": 6.5695758395945285,
+        "uncertainty": 4.3,
+        "unit": "M_earth",
+        "status": "derived",
+        "method": "Weiss & Marcy (2014) mass-radius relation, power-law (1.5 <= R <= 4 R_earth)",
+        "source": "WEISS__AMP__MARCY_2014",
+        "notes": "NO PUBLISHED MASS EXISTS for this planet. This value is model-dependent with large intrinsic scatter (published RMS 4.3 M_earth, reduced chi^2 6.2) and must never be presented as a measurement."
+      }
+    },
+    "f": {
+      "letter": "f",
+      "name": "Kepler-90 f",
+      "orbital_period_days": {
+        "value": 124.916337,
+        "uncertainty": null,
+        "unit": "days",
+        "status": "observed",
+        "source": "WEISS_ET_AL__2024"
+      },
+      "semi_major_axis_au": {
+        "value": 0.5060567991,
+        "unit": "au",
+        "status": "derived",
+        "source": "WEISS_ET_AL__2024",
+        "notes": "Consistent with Kepler's third law at M* = 1.108 M_sun (verified below).",
+        "kepler_third_law_check_au": 0.5060504273435948,
+        "kepler_third_law_rel_diff": 1.2590990609152238e-05
+      },
+      "eccentricity": {
+        "value": 0.0,
+        "uncertainty": null,
+        "unit": "dimensionless",
+        "status": "adopted-model",
+        "source": "WEISS_ET_AL__2024",
+        "notes": "Circular orbit assumed; Weiss et al. 2024 fix e = 0 with no uncertainty."
+      },
+      "inclination_deg": {
+        "value": 89.77,
+        "uncertainty": 0.31,
+        "unit": "deg",
+        "status": "observed",
+        "source": "CABRERA_ET_AL__2014",
+        "notes": "Published inclination. For transit geometry prefer `impact_parameter`, which is the directly measured transit-shape observable; see CHECK 5.",
+        "derived_from_impact_parameter_deg": 89.78162274343319
+      },
+      "impact_parameter": {
+        "value": 0.35,
+        "unit": "stellar radii",
+        "status": "observed",
+        "source": "CABRERA_ET_AL__2014",
+        "notes": "b = a cos(i) / R_star. This is what the transit light-curve shape actually constrains; the inclination is a derived restatement of it that depends on the adopted a and R_star.",
+        "consistency_with_published_inclination": "consistent"
+      },
+      "transit_epoch_bjd": {
+        "value": 2455087.704,
+        "uncertainty": 0.014,
+        "unit": "BJD_TDB",
+        "status": "observed",
+        "source": "CABRERA_ET_AL__2014",
+        "notes": "Sets the orbital phase of the initial condition."
+      },
+      "planet_radius_earth": {
+        "value": 2.77,
+        "uncertainty": 0.12,
+        "unit": "R_earth",
+        "status": "observed",
+        "source": "WEISS_ET_AL__2024"
+      },
+      "mass_earth": {
+        "value": 6.93838613022816,
+        "uncertainty": 4.3,
+        "unit": "M_earth",
+        "status": "derived",
+        "method": "Weiss & Marcy (2014) mass-radius relation, power-law (1.5 <= R <= 4 R_earth)",
+        "source": "WEISS__AMP__MARCY_2014",
+        "notes": "NO PUBLISHED MASS EXISTS for this planet. This value is model-dependent with large intrinsic scatter (published RMS 4.3 M_earth, reduced chi^2 6.2) and must never be presented as a measurement."
+      }
+    },
+    "g": {
+      "letter": "g",
+      "name": "Kepler-90 g",
+      "orbital_period_days": {
+        "value": 210.6031105,
+        "uncertainty": null,
+        "unit": "days",
+        "status": "observed",
+        "source": "WEISS_ET_AL__2024"
+      },
+      "semi_major_axis_au": {
+        "value": 0.7168522035,
+        "unit": "au",
+        "status": "derived",
+        "source": "WEISS_ET_AL__2024",
+        "notes": "Consistent with Kepler's third law at M* = 1.108 M_sun (verified below).",
+        "kepler_third_law_check_au": 0.7168431776253061,
+        "kepler_third_law_rel_diff": 1.259098409658265e-05
+      },
+      "eccentricity": {
+        "value": 0.0,
+        "uncertainty": null,
+        "unit": "dimensionless",
+        "status": "adopted-model",
+        "source": "WEISS_ET_AL__2024",
+        "notes": "Circular orbit assumed; Weiss et al. 2024 fix e = 0 with no uncertainty.",
+        "measured_alternates": [
+          {
+            "value": 0.049,
+            "uncertainty": 0.011,
+            "source": "LIANG_ET_AL__2021",
+            "status": "observed"
+          },
+          {
+            "value": 0.0292,
+            "uncertainty": 0.0038,
+            "source": "SHAW_ET_AL__2025",
+            "status": "observed"
+          }
+        ]
+      },
+      "inclination_deg": {
+        "value": 89.8,
+        "uncertainty": 0.06,
+        "unit": "deg",
+        "status": "observed",
+        "source": "CABRERA_ET_AL__2014",
+        "notes": "Published inclination. For transit geometry prefer `impact_parameter`, which is the directly measured transit-shape observable; see CHECK 5.",
+        "derived_from_impact_parameter_deg": 89.80179193145474
+      },
+      "impact_parameter": {
+        "value": 0.45,
+        "unit": "stellar radii",
+        "status": "observed",
+        "source": "CABRERA_ET_AL__2014",
+        "notes": "b = a cos(i) / R_star. This is what the transit light-curve shape actually constrains; the inclination is a derived restatement of it that depends on the adopted a and R_star.",
+        "consistency_with_published_inclination": "consistent"
+      },
+      "transit_epoch_bjd": {
+        "value": 2454980.0364,
+        "uncertainty": 0.0014,
+        "unit": "BJD_TDB",
+        "status": "observed",
+        "source": "CABRERA_ET_AL__2014",
+        "notes": "Sets the orbital phase of the initial condition."
+      },
+      "planet_radius_earth": {
+        "value": 7.718,
+        "uncertainty": 0.206,
+        "unit": "R_earth",
+        "status": "observed",
+        "source": "WEISS_ET_AL__2024"
+      },
+      "mass_earth": {
+        "value": 15.0,
+        "uncertainty": 0.9,
+        "unit": "M_earth",
+        "status": "observed",
+        "method": "dynamical mass from transit timing variations",
+        "source": "LIANG_ET_AL__2021",
+        "notes": "Independently corroborated by Shaw et al. 2025.",
+        "cross_check": {
+          "value": 15.0,
+          "uncertainty": 1.3,
+          "source": "SHAW_ET_AL__2025"
+        }
+      }
+    },
+    "h": {
+      "letter": "h",
+      "name": "Kepler-90 h",
+      "orbital_period_days": {
+        "value": 331.6011081,
+        "uncertainty": null,
+        "unit": "days",
+        "status": "observed",
+        "source": "WEISS_ET_AL__2024"
+      },
+      "semi_major_axis_au": {
+        "value": 0.9702055452,
+        "unit": "au",
+        "status": "derived",
+        "source": "WEISS_ET_AL__2024",
+        "notes": "Consistent with Kepler's third law at M* = 1.108 M_sun (verified below).",
+        "kepler_third_law_check_au": 0.9701933293499084,
+        "kepler_third_law_rel_diff": 1.2590991828512091e-05
+      },
+      "eccentricity": {
+        "value": 0.0,
+        "uncertainty": null,
+        "unit": "dimensionless",
+        "status": "adopted-model",
+        "source": "WEISS_ET_AL__2024",
+        "notes": "Circular orbit assumed; Weiss et al. 2024 fix e = 0 with no uncertainty.",
+        "measured_alternates": [
+          {
+            "value": -0.011,
+            "uncertainty": 0.002,
+            "source": "LIANG_ET_AL__2021",
+            "status": "observed",
+            "warning": "NEGATIVE VALUE \u2014 an eccentricity cannot be negative. This is almost certainly an eccentricity VECTOR COMPONENT (e cos w or e sin w) that the archive has mapped onto the scalar eccentricity column. It must NOT be used as an eccentricity. Flagged, not silently corrected."
+          },
+          {
+            "value": 0.0276,
+            "uncertainty": 0.0031,
+            "source": "SHAW_ET_AL__2025",
+            "status": "observed"
+          }
+        ]
+      },
+      "inclination_deg": {
+        "value": 89.6,
+        "uncertainty": 1.3,
+        "unit": "deg",
+        "status": "observed",
+        "source": "CABRERA_ET_AL__2014",
+        "notes": "Published inclination. For transit geometry prefer `impact_parameter`, which is the directly measured transit-shape observable; see CHECK 5.",
+        "derived_from_impact_parameter_deg": 89.88284073863775
+      },
+      "impact_parameter": {
+        "value": 0.36,
+        "unit": "stellar radii",
+        "status": "observed",
+        "source": "CABRERA_ET_AL__2014",
+        "notes": "b = a cos(i) / R_star. This is what the transit light-curve shape actually constrains; the inclination is a derived restatement of it that depends on the adopted a and R_star.",
+        "consistency_with_published_inclination": "INCONSISTENT - implied b > 1 (would not transit)"
+      },
+      "transit_epoch_bjd": {
+        "value": 2454973.49631,
+        "uncertainty": 0.00082,
+        "unit": "BJD_TDB",
+        "status": "observed",
+        "source": "CABRERA_ET_AL__2014",
+        "notes": "Sets the orbital phase of the initial condition."
+      },
+      "planet_radius_earth": {
+        "value": 11.252,
+        "uncertainty": 0.306,
+        "unit": "R_earth",
+        "status": "observed",
+        "source": "WEISS_ET_AL__2024"
+      },
+      "mass_earth": {
+        "value": 203.0,
+        "uncertainty": 5.0,
+        "unit": "M_earth",
+        "status": "observed",
+        "method": "dynamical mass from transit timing variations",
+        "source": "LIANG_ET_AL__2021",
+        "notes": "Independently corroborated by Shaw et al. 2025.",
+        "cross_check": {
+          "value": 203.0,
+          "uncertainty": 16.0,
+          "source": "SHAW_ET_AL__2025"
+        }
+      }
+    }
+  },
+  "consistency_checks": {
+    "kepler_third_law_max_rel_diff": 1.2591327358342352e-05,
+    "kepler_third_law_pass": true,
+    "cross_source_period_discrepancies": [
+      {
+        "planet": "b",
+        "adopted_days": 7.00828076,
+        "source": "CABRERA_ET_AL__2014",
+        "value_days": 7.008151,
+        "difference_seconds": -11.211264000007759
+      },
+      {
+        "planet": "c",
+        "adopted_days": 8.71982853,
+        "source": "CABRERA_ET_AL__2014",
+        "value_days": 8.719375,
+        "difference_seconds": -39.18499199997427
+      },
+      {
+        "planet": "i",
+        "adopted_days": 14.44912,
+        "source": "SHALLUE__AMP__VANDERBURG_2018",
+        "value_days": 14.44912,
+        "difference_seconds": 0.0
+      },
+      {
+        "planet": "d",
+        "adopted_days": 59.7370348,
+        "source": "CABRERA_ET_AL__2014",
+        "value_days": 59.73667,
+        "difference_seconds": -31.518720000599387
+      },
+      {
+        "planet": "e",
+        "adopted_days": 91.9404603,
+        "source": "CABRERA_ET_AL__2014",
+        "value_days": 91.93913,
+        "difference_seconds": -114.9379199993291
+      },
+      {
+        "planet": "f",
+        "adopted_days": 124.916337,
+        "source": "CABRERA_ET_AL__2014",
+        "value_days": 124.9144,
+        "difference_seconds": -167.35679999983404
+      },
+      {
+        "planet": "g",
+        "adopted_days": 210.6031105,
+        "source": "CABRERA_ET_AL__2014",
+        "value_days": 210.60697,
+        "difference_seconds": 333.4607999979198
+      },
+      {
+        "planet": "g",
+        "adopted_days": 210.6031105,
+        "source": "LIANG_ET_AL__2021",
+        "value_days": 210.48,
+        "difference_seconds": -10636.747200002083
+      },
+      {
+        "planet": "g",
+        "adopted_days": 210.6031105,
+        "source": "SHAW_ET_AL__2025",
+        "value_days": 210.73514,
+        "difference_seconds": 11407.348799998908
+      },
+      {
+        "planet": "h",
+        "adopted_days": 331.6011081,
+        "source": "CABRERA_ET_AL__2014",
+        "value_days": 331.60059,
+        "difference_seconds": -44.76383999699465
+      },
+      {
+        "planet": "h",
+        "adopted_days": 331.6011081,
+        "source": "LIANG_ET_AL__2021",
+        "value_days": 331.657,
+        "difference_seconds": 4829.0601600005175
+      },
+      {
+        "planet": "h",
+        "adopted_days": 331.6011081,
+        "source": "SHAW_ET_AL__2025",
+        "value_days": 331.60296,
+        "difference_seconds": 160.00416000169935
+      }
+    ],
+    "adjacent_pair_mutual_hill_separations": [
+      {
+        "pair": "b-c",
+        "delta_mutual_hill": 7.955922084247344
+      },
+      {
+        "pair": "c-i",
+        "delta_mutual_hill": 18.11016691160628
+      },
+      {
+        "pair": "i-d",
+        "delta_mutual_hill": 42.245051181521205
+      },
+      {
+        "pair": "d-e",
+        "delta_mutual_hill": 12.332212583498046
+      },
+      {
+        "pair": "e-f",
+        "delta_mutual_hill": 8.844048161380913
+      },
+      {
+        "pair": "f-g",
+        "delta_mutual_hill": 12.738170950992096
+      },
+      {
+        "pair": "g-h",
+        "delta_mutual_hill": 5.162017733055452
+      }
+    ],
+    "transit_geometry_consistency": [
+      {
+        "planet": "b",
+        "b_published": 0.13,
+        "b_from_inclination": 0.1409288268349964,
+        "inclination_from_b_deg": 89.44653064096711,
+        "status": "consistent"
+      },
+      {
+        "planet": "c",
+        "b_published": 0.09,
+        "b_from_inclination": 0.08694979184826697,
+        "inclination_from_b_deg": 89.66877424227268,
+        "status": "consistent"
+      },
+      {
+        "planet": "i",
+        "b_published": 0.5,
+        "b_from_inclination": 0.30438202640123424,
+        "inclination_from_b_deg": 88.68578942221586,
+        "status": "discrepant"
+      },
+      {
+        "planet": "d",
+        "b_published": 0.28,
+        "b_from_inclination": 0.2842327482207106,
+        "inclination_from_b_deg": 89.71431866926294,
+        "status": "consistent"
+      },
+      {
+        "planet": "e",
+        "b_published": 0.27,
+        "b_from_inclination": 0.2743710600089376,
+        "inclination_from_b_deg": 89.79334556645483,
+        "status": "consistent"
+      },
+      {
+        "planet": "f",
+        "b_published": 0.35,
+        "b_from_inclination": 0.3686280337381475,
+        "inclination_from_b_deg": 89.78162274343319,
+        "status": "consistent"
+      },
+      {
+        "planet": "g",
+        "b_published": 0.45,
+        "b_from_inclination": 0.45406827986419707,
+        "inclination_from_b_deg": 89.80179193145474,
+        "status": "consistent"
+      },
+      {
+        "planet": "h",
+        "b_published": 0.36,
+        "b_from_inclination": 1.2290870473857471,
+        "inclination_from_b_deg": 89.88284073863775,
+        "status": "INCONSISTENT - implied b > 1 (would not transit)"
+      }
+    ]
+  },
+  "bibliography": {
+    "WEISS_ET_AL__2024": {
+      "citation": "Weiss et al. (2024), ApJS 270, 8 \u2014 The Kepler Giant Planet Search",
+      "bibcode": "2024ApJS..270....8W",
+      "url": "https://ui.adsabs.harvard.edu/abs/2024ApJS..270....8W/abstract"
+    },
+    "CABRERA_ET_AL__2014": {
+      "citation": "Cabrera et al. (2014), ApJ 781, 18 \u2014 The planetary system to KIC 11442793: a compact analogue to the Solar System",
+      "bibcode": "2014ApJ...781...18C",
+      "url": "https://ui.adsabs.harvard.edu/abs/2014ApJ...781...18C/abstract"
+    },
+    "SHALLUE__AMP__VANDERBURG_2018": {
+      "citation": "Shallue & Vanderburg (2018), AJ 155, 94 \u2014 Identifying Exoplanets with Deep Learning: discovery of Kepler-90 i",
+      "bibcode": "2018AJ....155...94S",
+      "url": "https://ui.adsabs.harvard.edu/abs/2018AJ....155...94S/abstract"
+    },
+    "LIANG_ET_AL__2021": {
+      "citation": "Liang et al. (2021), AJ 161, 202 \u2014 transit-timing analysis of Kepler-90",
+      "bibcode": "2021AJ....161..202L",
+      "url": "https://ui.adsabs.harvard.edu/abs/2021AJ....161..202L/abstract"
+    },
+    "SHAW_ET_AL__2025": {
+      "citation": "Shaw et al. (2025), AJ 170, 146 \u2014 transit-timing analysis of Kepler-90",
+      "bibcode": "2025AJ....170..146S",
+      "url": "https://ui.adsabs.harvard.edu/abs/2025AJ....170..146S/abstract"
+    },
+    "FULTON__AMP__PETIGURA_2018": {
+      "citation": "Fulton & Petigura (2018), AJ 156, 264 \u2014 The California-Kepler Survey VII (homogeneous stellar parameters)",
+      "bibcode": "2018AJ....156..264F",
+      "url": "https://ui.adsabs.harvard.edu/abs/2018AJ....156..264F/abstract"
+    },
+    "WEISS__AMP__MARCY_2014": {
+      "citation": "Weiss & Marcy (2014), ApJ 783, L6 \u2014 The Mass-Radius Relation for 65 Exoplanets Smaller than 4 Earth Radii",
+      "bibcode": "2014ApJ...783L...6W",
+      "url": "https://ui.adsabs.harvard.edu/abs/2014ApJ...783L...6W/abstract"
+    },
+    "NASA_EXOPLANET_ARCHIVE": {
+      "citation": "NASA Exoplanet Archive, Planetary Systems (ps) table, TAP service",
+      "bibcode": "2013PASP..125..989A",
+      "url": "https://exoplanetarchive.ipac.caltech.edu/"
+    }
+  }
+}

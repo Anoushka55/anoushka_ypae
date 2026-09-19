@@ -1,0 +1,96 @@
+{
+  "span_days": 1499.7720826399943,
+  "timestep_days": 0.00700828076,
+  "steps_per_inner_orbit": 1000,
+  "eccentricity_mode": "adopted circular",
+  "contains_synthetic_body": false,
+  "planets": {
+    "b": {
+      "a_initial": 0.07416206989703777,
+      "a_fractional_range": 0.0006750473510965094,
+      "e_max": 0.0041581327691803055,
+      "period_measured_mean": 7.008214724690088,
+      "period_catalogue": 7.00828076
+    },
+    "c": {
+      "a_initial": 0.08579413859329184,
+      "a_fractional_range": 0.0004611893442023225,
+      "e_max": 0.0028306523460717523,
+      "period_measured_mean": 8.719871138468543,
+      "period_catalogue": 8.71982853
+    },
+    "i": {
+      "a_initial": 0.12012996789959124,
+      "a_fractional_range": 0.000137813863867909,
+      "e_max": 0.0002403557726266712,
+      "period_measured_mean": 14.449095898345686,
+      "period_catalogue": 14.44912
+    },
+    "d": {
+      "a_initial": 0.3094588959646542,
+      "a_fractional_range": 0.0003984108316444207,
+      "e_max": 0.0010945343474384488,
+      "period_measured_mean": 59.735063278911454,
+      "period_catalogue": 59.7370348
+    },
+    "e": {
+      "a_initial": 0.4125687506679975,
+      "a_fractional_range": 0.000915536956501185,
+      "e_max": 0.002639958713227648,
+      "period_measured_mean": 91.90674297028706,
+      "period_catalogue": 91.9404603
+    },
+    "f": {
+      "a_initial": 0.5059908734435214,
+      "a_fractional_range": 0.0012409599816098147,
+      "e_max": 0.0026466762296647552,
+      "period_measured_mean": 124.90138358210899,
+      "period_catalogue": 124.916337
+    },
+    "g": {
+      "a_initial": 0.7172611791626858,
+      "a_fractional_range": 0.006024004388663639,
+      "e_max": 0.01473254160705694,
+      "period_measured_mean": 209.87606189302184,
+      "period_catalogue": 210.6031105
+    },
+    "h": {
+      "a_initial": 0.9704820847482091,
+      "a_fractional_range": 0.0007147682366500011,
+      "e_max": 0.0013648100401828156,
+      "period_measured_mean": 331.61273347512616,
+      "period_catalogue": 331.6011081
+    }
+  },
+  "hill_separations": {
+    "b-c": 7.957359826629869,
+    "c-i": 18.10669566924537,
+    "i-d": 42.24654232718698,
+    "d-e": 12.337215841687899,
+    "e-f": 8.834610457929823,
+    "f-g": 12.763288444418574,
+    "g-h": 5.157223802214469
+  },
+  "orbit_crossing_margins_au": {
+    "b-c": 0.011050679209113637,
+    "c-i": 0.03406070961087654,
+    "i-d": 0.1889169375725655,
+    "d-e": 0.10142194637378327,
+    "e-f": 0.09083940634969756,
+    "f-g": 0.19670571746934573,
+    "g-h": 0.24261600666124583
+  },
+  "stability_checks": {
+    "no orbit crossing": true,
+    "semi-major axes bounded (no runaway)": true,
+    "all orbits remain elliptical": true,
+    "no close approach": true,
+    "energy conserved": true,
+    "angular momentum conserved": true
+  },
+  "min_separation_au": 0.011389133283288186,
+  "max_energy_error": 1.0723571405018681e-08,
+  "max_angular_momentum_error": 3.541849577417886e-14,
+  "max_momentum_error": 6.496352498403812e-19,
+  "stable": true
+}
