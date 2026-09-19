@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0",
   "system": "Kepler-90 (KOI-351, KIC 11442793)",
-  "generated_utc": "2026-09-19T06:50:14+00:00",
+  "generated_utc": "2026-09-19T13:06:05+00:00",
   "generated_by": "scripts/build_reference_dataset.py",
   "archive_snapshot": "data/raw/kepler90_ps_full_snapshot.csv",
   "archive_access_utc": "2026-09-19T06:03:26Z",
@@ -52,7 +52,8 @@
         "source": "WEISS_ET_AL__2024",
         "notes": "Consistent with Kepler's third law at M* = 1.108 M_sun (verified below).",
         "kepler_third_law_check_au": 0.0741632289555441,
-        "kepler_third_law_rel_diff": 1.259023795187182e-05
+        "kepler_third_law_rel_diff": 1.259023795187182e-05,
+        "shortcut_reproduction_rel_diff": 7.2800966652985e-10
       },
       "eccentricity": {
         "value": 0.0,
@@ -101,7 +102,8 @@
         "status": "derived",
         "method": "Weiss & Marcy (2014) mass-radius relation, density (R < 1.5 R_earth)",
         "source": "WEISS__AMP__MARCY_2014",
-        "notes": "NO PUBLISHED MASS EXISTS for this planet. This value is model-dependent with large intrinsic scatter (published RMS 4.3 M_earth, reduced chi^2 6.2) and must never be presented as a measurement."
+        "uncertainty_basis": "ASSUMED by this project: 50% of the mass, floor 0.5 M_earth; the paper quotes no scatter for R < 1.5 R_earth",
+        "notes": "NO PUBLISHED MASS EXISTS for this planet. This value is model-dependent with large intrinsic scatter and must never be presented as a measurement."
       }
     },
     "c": {
@@ -121,7 +123,8 @@
         "source": "WEISS_ET_AL__2024",
         "notes": "Consistent with Kepler's third law at M* = 1.108 M_sun (verified below).",
         "kepler_third_law_check_au": 0.08579321288402338,
-        "kepler_third_law_rel_diff": 1.2590767259623213e-05
+        "kepler_third_law_rel_diff": 1.2590767259623213e-05,
+        "shortcut_reproduction_rel_diff": 1.9869509891467546e-10
       },
       "eccentricity": {
         "value": 0.0,
@@ -170,7 +173,8 @@
         "status": "derived",
         "method": "Weiss & Marcy (2014) mass-radius relation, density (R < 1.5 R_earth)",
         "source": "WEISS__AMP__MARCY_2014",
-        "notes": "NO PUBLISHED MASS EXISTS for this planet. This value is model-dependent with large intrinsic scatter (published RMS 4.3 M_earth, reduced chi^2 6.2) and must never be presented as a measurement."
+        "uncertainty_basis": "ASSUMED by this project: 50% of the mass, floor 0.5 M_earth; the paper quotes no scatter for R < 1.5 R_earth",
+        "notes": "NO PUBLISHED MASS EXISTS for this planet. This value is model-dependent with large intrinsic scatter and must never be presented as a measurement."
       }
     },
     "i": {
@@ -190,7 +194,8 @@
         "source": "WEISS_ET_AL__2024",
         "notes": "Consistent with Kepler's third law at M* = 1.108 M_sun (verified below).",
         "kepler_third_law_check_au": 0.12013657160205238,
-        "kepler_third_law_rel_diff": 1.2591327358342352e-05
+        "kepler_third_law_rel_diff": 1.2591327358342352e-05,
+        "shortcut_reproduction_rel_diff": 3.614104337649484e-10
       },
       "eccentricity": {
         "value": 0.0,
@@ -239,7 +244,8 @@
         "status": "derived",
         "method": "Weiss & Marcy (2014) mass-radius relation, density (R < 1.5 R_earth)",
         "source": "WEISS__AMP__MARCY_2014",
-        "notes": "NO PUBLISHED MASS EXISTS for this planet. This value is model-dependent with large intrinsic scatter (published RMS 4.3 M_earth, reduced chi^2 6.2) and must never be presented as a measurement."
+        "uncertainty_basis": "ASSUMED by this project: 50% of the mass, floor 0.5 M_earth; the paper quotes no scatter for R < 1.5 R_earth",
+        "notes": "NO PUBLISHED MASS EXISTS for this planet. This value is model-dependent with large intrinsic scatter and must never be presented as a measurement."
       }
     },
     "d": {
@@ -259,7 +265,8 @@
         "source": "WEISS_ET_AL__2024",
         "notes": "Consistent with Kepler's third law at M* = 1.108 M_sun (verified below).",
         "kepler_third_law_check_au": 0.3094639584964323,
-        "kepler_third_law_rel_diff": 1.2590979983012384e-05
+        "kepler_third_law_rel_diff": 1.2590979983012384e-05,
+        "shortcut_reproduction_rel_diff": 1.4030802162987128e-11
       },
       "eccentricity": {
         "value": 0.0,
@@ -308,7 +315,8 @@
         "status": "derived",
         "method": "Weiss & Marcy (2014) mass-radius relation, power-law (1.5 <= R <= 4 R_earth)",
         "source": "WEISS__AMP__MARCY_2014",
-        "notes": "NO PUBLISHED MASS EXISTS for this planet. This value is model-dependent with large intrinsic scatter (published RMS 4.3 M_earth, reduced chi^2 6.2) and must never be presented as a measurement."
+        "uncertainty_basis": "published RMS of masses about the fit (Weiss & Marcy 2014)",
+        "notes": "NO PUBLISHED MASS EXISTS for this planet. This value is model-dependent with large intrinsic scatter and must never be presented as a measurement."
       }
     },
     "e": {
@@ -328,7 +336,8 @@
         "source": "WEISS_ET_AL__2024",
         "notes": "Consistent with Kepler's third law at M* = 1.108 M_sun (verified below).",
         "kepler_third_law_check_au": 0.412526720873726,
-        "kepler_third_law_rel_diff": 1.2590847120356563e-05
+        "kepler_third_law_rel_diff": 1.2590847120356563e-05,
+        "shortcut_reproduction_rel_diff": 1.188335193345945e-10
       },
       "eccentricity": {
         "value": 0.0,
@@ -377,7 +386,8 @@
         "status": "derived",
         "method": "Weiss & Marcy (2014) mass-radius relation, power-law (1.5 <= R <= 4 R_earth)",
         "source": "WEISS__AMP__MARCY_2014",
-        "notes": "NO PUBLISHED MASS EXISTS for this planet. This value is model-dependent with large intrinsic scatter (published RMS 4.3 M_earth, reduced chi^2 6.2) and must never be presented as a measurement."
+        "uncertainty_basis": "published RMS of masses about the fit (Weiss & Marcy 2014)",
+        "notes": "NO PUBLISHED MASS EXISTS for this planet. This value is model-dependent with large intrinsic scatter and must never be presented as a measurement."
       }
     },
     "f": {
@@ -397,7 +407,8 @@
         "source": "WEISS_ET_AL__2024",
         "notes": "Consistent with Kepler's third law at M* = 1.108 M_sun (verified below).",
         "kepler_third_law_check_au": 0.5060504273435948,
-        "kepler_third_law_rel_diff": 1.2590990609152238e-05
+        "kepler_third_law_rel_diff": 1.2590990609152238e-05,
+        "shortcut_reproduction_rel_diff": 2.4657348030020885e-11
       },
       "eccentricity": {
         "value": 0.0,
@@ -446,7 +457,8 @@
         "status": "derived",
         "method": "Weiss & Marcy (2014) mass-radius relation, power-law (1.5 <= R <= 4 R_earth)",
         "source": "WEISS__AMP__MARCY_2014",
-        "notes": "NO PUBLISHED MASS EXISTS for this planet. This value is model-dependent with large intrinsic scatter (published RMS 4.3 M_earth, reduced chi^2 6.2) and must never be presented as a measurement."
+        "uncertainty_basis": "published RMS of masses about the fit (Weiss & Marcy 2014)",
+        "notes": "NO PUBLISHED MASS EXISTS for this planet. This value is model-dependent with large intrinsic scatter and must never be presented as a measurement."
       }
     },
     "g": {
@@ -466,7 +478,8 @@
         "source": "WEISS_ET_AL__2024",
         "notes": "Consistent with Kepler's third law at M* = 1.108 M_sun (verified below).",
         "kepler_third_law_check_au": 0.7168431776253061,
-        "kepler_third_law_rel_diff": 1.259098409658265e-05
+        "kepler_third_law_rel_diff": 1.259098409658265e-05,
+        "shortcut_reproduction_rel_diff": 1.8144505664895377e-11
       },
       "eccentricity": {
         "value": 0.0,
@@ -529,12 +542,38 @@
         "status": "observed",
         "method": "dynamical mass from transit timing variations",
         "source": "LIANG_ET_AL__2021",
-        "notes": "Independently corroborated by Shaw et al. 2025.",
+        "notes": "Shaw et al. 2025 lists identical central values (with larger uncertainties); the archive record does not show whether that is an independent determination, so it is treated as consistent, not as independent confirmation.",
         "cross_check": {
           "value": 15.0,
           "uncertainty": 1.3,
           "source": "SHAW_ET_AL__2025"
-        }
+        },
+        "all_published_masses": [
+          {
+            "source": "LIANG_ET_AL__2021",
+            "mass_earth": 15.0,
+            "uncertainty_earth": 0.9,
+            "archive_flag": "Mass"
+          },
+          {
+            "source": "SHAW_ET_AL__2025",
+            "mass_earth": 15.0,
+            "uncertainty_earth": 1.3,
+            "archive_flag": "Mass"
+          },
+          {
+            "source": "WEISS_ET_AL__2024",
+            "mass_earth": 22.70577859,
+            "uncertainty_earth": 24.51579472,
+            "archive_flag": "Msini"
+          },
+          {
+            "source": "SANTERNE_ET_AL__2016",
+            "mass_earth": 254.264,
+            "uncertainty_earth": null,
+            "archive_flag": "Mass"
+          }
+        ]
       }
     },
     "h": {
@@ -554,7 +593,8 @@
         "source": "WEISS_ET_AL__2024",
         "notes": "Consistent with Kepler's third law at M* = 1.108 M_sun (verified below).",
         "kepler_third_law_check_au": 0.9701933293499084,
-        "kepler_third_law_rel_diff": 1.2590991828512091e-05
+        "kepler_third_law_rel_diff": 1.2590991828512091e-05,
+        "shortcut_reproduction_rel_diff": 2.5876562345328397e-11
       },
       "eccentricity": {
         "value": 0.0,
@@ -618,12 +658,38 @@
         "status": "observed",
         "method": "dynamical mass from transit timing variations",
         "source": "LIANG_ET_AL__2021",
-        "notes": "Independently corroborated by Shaw et al. 2025.",
+        "notes": "Shaw et al. 2025 lists identical central values (with larger uncertainties); the archive record does not show whether that is an independent determination, so it is treated as consistent, not as independent confirmation.",
         "cross_check": {
           "value": 203.0,
           "uncertainty": 16.0,
           "source": "SHAW_ET_AL__2025"
-        }
+        },
+        "all_published_masses": [
+          {
+            "source": "LIANG_ET_AL__2021",
+            "mass_earth": 203.0,
+            "uncertainty_earth": 5.0,
+            "archive_flag": "Mass"
+          },
+          {
+            "source": "SHAW_ET_AL__2025",
+            "mass_earth": 203.0,
+            "uncertainty_earth": 16.0,
+            "archive_flag": "Mass"
+          },
+          {
+            "source": "WEISS_ET_AL__2024",
+            "mass_earth": 235.7495194,
+            "uncertainty_earth": 33.4383406,
+            "archive_flag": "Msini"
+          },
+          {
+            "source": "SANTERNE_ET_AL__2016",
+            "mass_earth": 381.396,
+            "uncertainty_earth": null,
+            "archive_flag": "Mass"
+          }
+        ]
       }
     }
   },

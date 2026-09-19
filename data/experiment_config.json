@@ -1,0 +1,40 @@
+{
+  "description": "Complete configuration of the Invisible Planet experiment. Planet X is SYNTHETIC; this is not a claim about the real Kepler-90 system.",
+  "version": 2,
+  "numerics": {
+    "steps_per_inner_orbit": 1000,
+    "epoch_bjd": 2454964.5,
+    "duration_days": 1459.5,
+    "integrator": "velocity Verlet (kick-drift-kick), fixed step, f64"
+  },
+  "observations": {
+    "pattern_file": "data/kepler90_observed_transits.json",
+    "noise_scale": 1.0,
+    "noise_seed": 20260919
+  },
+  "inference": {
+    "fap_threshold": 0.01,
+    "n_peaks": 6,
+    "n_null_trials": 20000,
+    "n_walkers": 32,
+    "n_steps": 400,
+    "sampler_seed": 7
+  },
+  "blind_recovery": {
+    "n_cases": 20,
+    "master_seed": 20260919
+  },
+  "planet_x_ground_truth": {
+    "mass_earth": 100.0,
+    "semi_major_axis_au": 0.20600000000000007,
+    "eccentricity": 0.0,
+    "mean_anomaly": 2.0943951023931953,
+    "inclination_deg": 87.85365283380447,
+    "argument_of_periapsis": 0.0,
+    "longitude_of_ascending_node_deg": 0.0,
+    "radius_earth": 4.0,
+    "status": "synthetic",
+    "warning": "Planet X is not real and is not a claim about Kepler-90.",
+    "selected_by": "scripts/select_planet_x.py from data/planet_x_sweep.json"
+  }
+}

@@ -1,0 +1,427 @@
+{
+  "description": "Real, published per-transit timing measurements for the Kepler-90 planets whose individual transit times have been published, used as the timing-noise model and observing pattern of the synthetic experiment.",
+  "time_system": "BJD_TDB as published (Kepler barycentric time)",
+  "kepler_window_bjd": [
+    2454964.5,
+    2456424.0
+  ],
+  "probe_planets": [
+    "d",
+    "e"
+  ],
+  "timing_planets": [
+    "d",
+    "e",
+    "g",
+    "h"
+  ],
+  "probe_rule": {
+    "min_transits": 5,
+    "max_reduced_chi2": 3.0
+  },
+  "planets": {
+    "d": {
+      "source": "Holczer et al. (2016), ApJS 225, 9, table 3",
+      "source_id": "KOI-351.03",
+      "measured_bjd": [
+        2454991.948302444,
+        2455051.6920422222,
+        2455111.438699667,
+        2455171.173828333,
+        2455290.642003333,
+        2455350.384494111,
+        2455410.1268450003,
+        2455469.8696135557,
+        2455529.58377,
+        2455649.081250556,
+        2455708.8198514446,
+        2455768.535536667,
+        2455828.292887556,
+        2455888.014406111,
+        2456067.2215986666,
+        2456186.6958847777
+      ],
+      "sigma_days": [
+        0.007638888888888889,
+        0.0037500000000000003,
+        0.008333333333333333,
+        0.006944444444444444,
+        0.007638888888888889,
+        0.0060416666666666665,
+        0.011805555555555555,
+        0.007638888888888889,
+        0.006666666666666666,
+        0.0125,
+        0.008333333333333333,
+        0.006944444444444444,
+        0.006944444444444444,
+        0.005625,
+        0.006944444444444444,
+        0.004861111111111111
+      ],
+      "published_epoch_numbers": [
+        0,
+        1,
+        2,
+        3,
+        5,
+        6,
+        7,
+        8,
+        9,
+        11,
+        12,
+        13,
+        14,
+        15,
+        18,
+        20
+      ],
+      "outlier_flag": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "uncertainty_estimated_flag": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true,
+        false,
+        false,
+        false
+      ],
+      "epochs": [
+        0,
+        1,
+        2,
+        3,
+        5,
+        6,
+        7,
+        8,
+        9,
+        11,
+        12,
+        13,
+        14,
+        15,
+        18,
+        20
+      ],
+      "ephemeris": {
+        "t0_bjd": 2454991.9583994434,
+        "period_days": 59.73715089195691,
+        "t0_unc_days": 0.0027117033864473687,
+        "period_unc_days": 0.0002432847433794325,
+        "weighted_fit_chi2": 21.287744450891044,
+        "dof": 14,
+        "rms_residual_minutes": 12.866883481267921
+      },
+      "n_transits": 16,
+      "median_sigma_seconds": 600.0,
+      "linear_ephemeris_reduced_chi2": 1.520553175063646,
+      "probe_rejection_reasons": []
+    },
+    "e": {
+      "source": "Holczer et al. (2016), ApJS 225, 9, table 3",
+      "source_id": "KOI-351.04",
+      "measured_bjd": [
+        2454967.315316889,
+        2455059.2379882224,
+        2455151.2030196665,
+        2455335.073291889,
+        2455426.9974205554,
+        2455518.9332863335,
+        2455702.810571444,
+        2455794.746437222,
+        2455886.701052,
+        2456070.578199222,
+        2456162.541286222,
+        2456254.458401
+      ],
+      "sigma_days": [
+        0.011805555555555555,
+        0.009027777777777777,
+        0.013194444444444444,
+        0.005694444444444444,
+        0.010416666666666666,
+        0.0125,
+        0.009027777777777777,
+        0.011805555555555555,
+        0.014583333333333334,
+        0.006805555555555556,
+        0.01597222222222222,
+        0.007638888888888889
+      ],
+      "published_epoch_numbers": [
+        0,
+        1,
+        2,
+        4,
+        5,
+        6,
+        8,
+        9,
+        10,
+        12,
+        13,
+        14
+      ],
+      "outlier_flag": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "uncertainty_estimated_flag": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "epochs": [
+        0,
+        1,
+        2,
+        4,
+        5,
+        6,
+        8,
+        9,
+        10,
+        12,
+        13,
+        14
+      ],
+      "ephemeris": {
+        "t0_bjd": 2454967.309340129,
+        "period_days": 91.93906858791829,
+        "t0_unc_days": 0.005016403840094056,
+        "period_unc_days": 0.0005915159128386981,
+        "weighted_fit_chi2": 11.413975351142733,
+        "dof": 10,
+        "rms_residual_minutes": 16.260344592082397
+      },
+      "n_transits": 12,
+      "median_sigma_seconds": 959.9999999999999,
+      "linear_ephemeris_reduced_chi2": 1.1413975351142733,
+      "probe_rejection_reasons": []
+    },
+    "g": {
+      "source": "Liang, Robnik & Seljak (2021), AJ 161, 202, fig. 1 data",
+      "source_id": "Kepler-90g",
+      "measured_bjd": [
+        2454980.101199772,
+        2455190.5533046657,
+        2455401.2858635625,
+        2455822.479007485,
+        2456033.0655651917,
+        2456244.7408630806
+      ],
+      "sigma_days": [
+        0.0026802588290274,
+        0.0024096353155952,
+        0.0026115289756468,
+        0.001,
+        0.0012,
+        0.0012
+      ],
+      "published_epoch_numbers": null,
+      "outlier_flag": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "uncertainty_estimated_flag": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "epochs": [
+        0,
+        1,
+        2,
+        4,
+        5,
+        6
+      ],
+      "ephemeris": {
+        "t0_bjd": 2454979.5859328657,
+        "period_days": 210.77466963163621,
+        "t0_unc_days": 0.0016469753926830874,
+        "period_unc_days": 0.0003614180442389741,
+        "weighted_fit_chi2": 375043.6932800205,
+        "dof": 4,
+        "rms_residual_minutes": 519.051996829415
+      },
+      "n_transits": 6,
+      "median_sigma_seconds": 155.93624563371264,
+      "linear_ephemeris_reduced_chi2": 93760.92332000512,
+      "probe_rejection_reasons": [
+        "real O-C is NOT consistent with a straight line (reduced chi2 = 93761 > 3.0): large real TTV that a circular model cannot reproduce"
+      ]
+    },
+    "h": {
+      "source": "Liang, Robnik & Seljak (2021), AJ 161, 202, fig. 1 data",
+      "source_id": "Kepler-90h",
+      "measured_bjd": [
+        2454973.478040421,
+        2455305.1209698245,
+        2456299.8937549796
+      ],
+      "sigma_days": [
+        0.0012867521900565,
+        0.0013224483459468,
+        0.001
+      ],
+      "published_epoch_numbers": null,
+      "outlier_flag": [
+        0,
+        0,
+        0
+      ],
+      "uncertainty_estimated_flag": [
+        false,
+        false,
+        false
+      ],
+      "epochs": [
+        0,
+        1,
+        4
+      ],
+      "ephemeris": {
+        "t0_bjd": 2454973.495698481,
+        "period_days": 331.6004028588727,
+        "t0_unc_days": 0.0010457017736109778,
+        "period_unc_days": 0.0003789034785768409,
+        "weighted_fit_chi2": 554.5810176240086,
+        "dof": 1,
+        "rms_residual_minutes": 25.528864646850792
+      },
+      "n_transits": 3,
+      "median_sigma_seconds": 111.1753892208816,
+      "linear_ephemeris_reduced_chi2": 554.5810176240086,
+      "probe_rejection_reasons": [
+        "only 3 published transits (< 5)"
+      ]
+    }
+  },
+  "excluded_planets": {
+    "b": "no published individual transit times; per-transit SNR ~1.5",
+    "c": "no published individual transit times; per-transit SNR ~2.2",
+    "i": "no published individual transit times; per-transit SNR not tabulated (~1-2 estimated)",
+    "f": "no published individual transit times"
+  },
+  "carter_photon_noise": {
+    "b": {
+      "per_transit_snr": 1.54718009092873,
+      "theta": 0.010097738565735745,
+      "sigma_seconds": 623.9477012808006,
+      "koi_num_transits": 154,
+      "koi_model_snr": 19.2
+    },
+    "c": {
+      "per_transit_snr": 2.1545886503581726,
+      "theta": 0.013236229119704063,
+      "sigma_seconds": 502.44990613528574,
+      "koi_num_transits": 111,
+      "koi_model_snr": 22.7
+    },
+    "d": {
+      "per_transit_snr": 10.875,
+      "theta": 0.02167854196354909,
+      "sigma_seconds": 269.8867464236104,
+      "koi_num_transits": 16,
+      "koi_model_snr": 43.5
+    },
+    "e": {
+      "per_transit_snr": 9.930424630061564,
+      "theta": 0.020029518449030646,
+      "sigma_seconds": 327.03477168166756,
+      "koi_num_transits": 12,
+      "koi_model_snr": 34.4
+    },
+    "f": {
+      "per_transit_snr": 9.222333141425143,
+      "theta": 0.2323951928199293,
+      "sigma_seconds": 1289.3990264962472,
+      "koi_num_transits": 7,
+      "koi_model_snr": 24.4
+    },
+    "g": {
+      "per_transit_snr": 94.87690270380178,
+      "theta": 0.05874823499293998,
+      "sigma_seconds": 73.65980750994167,
+      "koi_num_transits": 6,
+      "koi_model_snr": 232.4
+    },
+    "h": {
+      "per_transit_snr": 204.95934556231717,
+      "theta": 0.08314825930372148,
+      "sigma_seconds": 47.62572113666611,
+      "koi_num_transits": 3,
+      "koi_model_snr": 355.0
+    }
+  },
+  "implied_cadence_noise_ppm": {
+    "b": 209.75405976584406,
+    "c": 205.73629591597157,
+    "d": 210.36673923693314,
+    "e": 210.56542922046154,
+    "f": 266.8449035117179,
+    "g": 216.78588227318443,
+    "h": 220.05365073936719
+  },
+  "source_files": [
+    "data/raw/holczer2016_table3_koi351.csv",
+    "data/raw/liang2021_kepler90gh_transit_times.csv",
+    "data/raw/kepler90_koi_cumulative.csv"
+  ],
+  "vizier_access_utc": "2026-09-19T13:15:11Z"
+}

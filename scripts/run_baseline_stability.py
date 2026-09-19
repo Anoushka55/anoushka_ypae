@@ -27,6 +27,7 @@ import numpy as np
 from invisible_planet.physics.diagnostics import hill_separations, osculating_elements
 from invisible_planet.physics.engine import NBodyEngine
 from invisible_planet.systems.kepler90 import (
+    DEFAULT_DURATION_DAYS,
     PLANET_ORDER,
     build_kepler90,
     load_reference,
@@ -38,8 +39,10 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--days", type=float, default=1500.0,
-                        help="integration span in days (default: the Kepler baseline)")
+    parser.add_argument("--days", type=float, default=DEFAULT_DURATION_DAYS,
+                        help="integration span in days (default: the Kepler Q1-Q17 window)")
+    parser.add_argument("--catalogue", action="store_true",
+                        help="use catalogue periods as osculating periods instead of the matched initial conditions")
     parser.add_argument("--steps-per-inner-orbit", type=int, default=1000)
     parser.add_argument("--samples", type=int, default=400)
     parser.add_argument("--eccentric", action="store_true",
@@ -48,7 +51,8 @@ def main() -> None:
     args = parser.parse_args()
 
     reference = load_reference()
-    system = build_kepler90(use_measured_eccentricities=args.eccentric, reference=reference)
+    system = build_kepler90(use_measured_eccentricities=args.eccentric, reference=reference,
+                            initial_conditions="catalogue" if args.catalogue else "matched")
     dt = recommended_timestep(reference, args.steps_per_inner_orbit)
     n_steps = int(args.days / dt)
     chunk = max(1, n_steps // args.samples)
@@ -57,6 +61,7 @@ def main() -> None:
     print(f"Bodies        : {system.n_bodies} (1 star + {system.n_bodies - 1} planets)")
     print(f"Epoch         : BJD {system.epoch}")
     print(f"Eccentricities: {system.metadata['eccentricity_mode']}")
+    print(f"Initial conditions: {system.metadata['initial_conditions']}")
     print(f"Timestep      : {dt:.8f} d  ({args.steps_per_inner_orbit} steps/inner orbit)")
     print(f"Span          : {args.days:.1f} d  ({n_steps} steps)")
     print(f"Synthetic body: {system.metadata['contains_synthetic_body']}")
@@ -126,7 +131,7 @@ def main() -> None:
         )
 
     print()
-    print("MEASURED vs CATALOGUE PERIODS (osculating, time-averaged)")
+    print("TIME-AVERAGED OSCULATING PERIODS vs CATALOGUE (these differ from the MEAN TRANSIT period; see match_visible_system.py)")
     print(f"{'planet':>7} {'catalogue [d]':>14} {'measured [d]':>14} {'diff [s]':>12} {'rel':>11}")
     for idx, letter in enumerate(PLANET_ORDER):
         measured = float(np.mean(periods_arr[:, idx]))

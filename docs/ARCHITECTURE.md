@@ -64,20 +64,23 @@ must use `hostname='KOI-351'`.
 3. **Eccentricities are adopted, not measured**, for b–f. Weiss et al. 2024 fixes
    e = 0 for all eight planets (no error bars). Only g and h have measured
    eccentricities.
-4. **The real system genuinely exhibits TTVs** — the masses of g and h were themselves
-   *derived from transit timing variations*. This is a strong scientific foundation:
-   the project's premise (infer an unseen mass from timing residuals) is exactly the
-   method by which two of this system's real planet masses are known.
+4. **The real system genuinely exhibits TTVs** — the adopted masses of g and h were
+   *derived from transit timing variations* (Liang et al. 2021). This grounds the
+   project's premise (infer a mass from timing residuals) in a method that has been applied
+   to this very system, although other published masses for g and h disagree
+   (`docs/KEPLER90_DATA.md`, CHECK 6).
 5. Stellar mass disagrees across sources (0.967 → 1.242 M☉). A single self-consistent
    choice must be made and justified, because **semi-major axis depends on it**
    through Kepler's third law.
 
-A verified consistency check already performed: Weiss et al. 2024's semi-major axes are
-internally consistent with their stellar mass via Kepler's third law
-(planet h: P = 331.601108 d, M★ = 1.108 M☉ ⇒ a = 0.97005 AU vs. published 0.970206 AU,
-agreement to 1.6 × 10⁻⁴). Weiss et al. 2024 is therefore the best-supported
-*self-consistent orbital solution*, and its M★ = 1.108 M☉ matches Fulton & Petigura
-2018 exactly — the two can be paired without mixing stellar scales.
+A consistency check performed against the archive snapshot (reproduced by
+`scripts/build_reference_dataset.py`, CHECK 1 and 1b): for planet h, Kepler's third law with
+the IAU value of GM☉, M★ = 1.108 M☉ and P = 331.601108 d gives a = 0.970193 au against the
+published 0.970206 au (relative difference 1.3×10⁻⁵, identical for all eight planets). That
+uniform offset is not a disagreement about the system: the published axes equal
+(M★ P_yr²)^(1/3) to 7×10⁻¹⁰, i.e. they were computed with the 4π² au³/yr² shortcut and
+the stellar mass alone (`docs/UNITS.md`). Weiss et al. 2024 adopt the same M★ = 1.108 M☉ as
+Fulton & Petigura 2018, so the two can be paired without mixing stellar-mass scales.
 
 ---
 

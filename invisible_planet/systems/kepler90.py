@@ -62,10 +62,13 @@ REFERENCE_PATH = Path(__file__).resolve().parents[2] / "data" / "kepler90_refere
 #: Planet order by increasing period, matching the dataset.
 PLANET_ORDER = ["b", "c", "i", "d", "e", "f", "g", "h"]
 
-#: Reference epoch for all initial conditions [BJD_TDB].
-#: Chosen as the earliest transit epoch in the dataset so that the integration
-#: starts at the beginning of the observed window and runs forward.
-DEFAULT_EPOCH_BJD = 2454967.0
+#: Reference epoch for all initial conditions [BJD_TDB]: the start of Kepler's Q1
+#: science photometry (BKJD 131.5 = BJD 2454964.5), so the integration spans the real
+#: observing window. The simulation window ends at BKJD 1591.0 (end of Q17).
+DEFAULT_EPOCH_BJD = 2454964.5
+DEFAULT_DURATION_DAYS = 1459.5
+
+MATCHED_PATH = Path(__file__).resolve().parents[2] / "data" / "kepler90_matched_initial_conditions.json"
 
 
 def load_reference(path: Path | None = None) -> dict:
@@ -108,30 +111,67 @@ def inclination_from_impact_parameter(
     return float(np.arccos(cos_i))
 
 
+def load_matched(path: Path | None = None) -> dict:
+    """Initial osculating period and mean anomaly of each planet, fitted to the real
+    transit times by scripts/match_visible_system.py (see systems/matching.py)."""
+    target = path or MATCHED_PATH
+    if not target.exists():
+        raise FileNotFoundError(
+            f"{target} does not exist. Run scripts/match_visible_system.py, or build the "
+            "system with initial_conditions='catalogue'."
+        )
+    return json.loads(target.read_text(encoding="utf-8"))
+
+
 def build_kepler90(
     epoch_bjd: float = DEFAULT_EPOCH_BJD,
     use_measured_eccentricities: bool = False,
     planets: list[str] | None = None,
     reference: dict | None = None,
     inclination_source: str = "impact_parameter",
+    initial_conditions: str = "matched",
+    period_overrides: dict | None = None,
+    mean_anomaly_overrides: dict | None = None,
 ) -> SystemState:
     """Construct the Kepler-90 system as barycentric Cartesian initial conditions.
 
     Parameters
     ----------
-    epoch_bjd : reference epoch; all mean anomalies are propagated to this time.
+    epoch_bjd : reference epoch; all mean anomalies refer to this time.
     use_measured_eccentricities : use the measured e for g and h instead of the
         adopted circular baseline. Negative archive values (which are eccentricity
         vector components mis-mapped onto the scalar column) are refused.
     planets : subset of planet letters to include. Used by tests that need an
         isolated single-planet system.
+    initial_conditions :
+        "matched"   - each planet's initial osculating period and mean anomaly are those
+                      fitted to the real transit times (systems/matching.py). This is the
+                      default: catalogue periods are OBSERVED MEAN TRANSIT PERIODS, which
+                      in a near-resonant system differ from osculating periods by up to
+                      0.3% (planet g), so using them directly as osculating values would
+                      misrepresent the observed system.
+        "catalogue" - catalogue period as the osculating period, and the phase from the
+                      catalogue transit epoch. The starting point of the matching, and
+                      used by tests of the raw catalogue conversion.
+    period_overrides, mean_anomaly_overrides : {letter: value}. Applied last; used by the
+        matching fit to perturb one planet at a time.
     """
+    if initial_conditions not in ("matched", "catalogue"):
+        raise ValueError(f"unknown initial_conditions: {initial_conditions!r}")
     ref = reference if reference is not None else load_reference()
     star = ref["star"]
     chosen = planets if planets is not None else PLANET_ORDER
     stellar_radius_au = solar_radii_to_au(star["radius_solar"]["value"])
     if inclination_source not in ("impact_parameter", "published"):
         raise ValueError(f"unknown inclination_source: {inclination_source!r}")
+
+    matched = load_matched() if initial_conditions == "matched" else None
+    if matched is not None and abs(matched["epoch_bjd"] - epoch_bjd) > 1e-9:
+        raise ValueError(
+            f"matched initial conditions are for epoch {matched['epoch_bjd']}, not {epoch_bjd}"
+        )
+    period_overrides = period_overrides or {}
+    mean_anomaly_overrides = mean_anomaly_overrides or {}
 
     bodies = [
         BodySpec(
@@ -159,29 +199,34 @@ def build_kepler90(
                     )
                 eccentricity = alt["value"]
 
-        # With e = 0 the periapsis — and therefore omega — is undefined; 0 is the
+        # With e = 0 the periapsis - and therefore omega - is undefined; 0 is the
         # conventional choice and the transit condition reduces to nu = pi/2.
         argument_of_periapsis = 0.0
 
-        # ------------------------------------------------------------------
-        # Semi-major axis is DERIVED FROM THE MEASURED PERIOD, not read from the
-        # catalogue, and this is a substantive choice.
-        #
-        # The catalogue's semi-major axes were computed from Kepler's third law
-        # using the STELLAR MASS ALONE:  a^3 = G M_star P^2 / 4 pi^2. The correct
-        # two-body relation uses the TOTAL mass, a^3 = G (M_star + m_p) P^2/4 pi^2.
-        # Neglecting the planet mass is harmless for small planets but not for
-        # Kepler-90 h, whose mass is 5.5e-4 of the star: feeding the catalogue's a
-        # into a dynamical model that (correctly) uses the total mass yields an
-        # orbital period 2.75e-4 too short — about 2.2 hours per orbit.
-        #
-        # For a transit-timing project the period is the DIRECTLY MEASURED
-        # quantity and the semi-major axis is derived from it; the dataset
-        # already classifies them that way. So we honour the measured period and
-        # derive a consistently.
-        # ------------------------------------------------------------------
         planet_mass = p["mass_earth"]["value"] * EARTH_MASS_IN_SOLAR
-        semi_major_axis = kepler_third_law_axis(period, star["mass_solar"]["value"] + planet_mass)
+
+        # Catalogue-based starting values: the catalogue period is used as the osculating
+        # period, and the phase is propagated from the catalogue transit epoch with the
+        # osculating mean motion 2 pi / P.
+        mean_anomaly_at_transit = transit_mean_anomaly(eccentricity, argument_of_periapsis)
+        osculating_period = period
+        mean_anomaly = mean_anomaly_at_transit + 2.0 * np.pi * (epoch_bjd - transit_epoch) / period
+
+        if matched is not None and letter in matched["planets"]:
+            osculating_period = matched["planets"][letter]["osculating_period_days"]
+            mean_anomaly = matched["planets"][letter]["mean_anomaly_rad"]
+        if letter in period_overrides:
+            osculating_period = period_overrides[letter]
+        if letter in mean_anomaly_overrides:
+            mean_anomaly = mean_anomaly_overrides[letter]
+
+        # The semi-major axis is DERIVED from the osculating period and the TOTAL mass
+        # (Kepler's third law), never read from the catalogue: the catalogue values equal
+        # (M_star P_yr^2)^(1/3), i.e. the 4 pi^2 shortcut with the stellar mass alone
+        # (docs/UNITS.md; CHECK 1b in docs/KEPLER90_DATA.md).
+        semi_major_axis = kepler_third_law_axis(
+            osculating_period, star["mass_solar"]["value"] + planet_mass
+        )
         impact_parameter = p.get("impact_parameter", {}).get("value")
         if inclination_source == "impact_parameter" and impact_parameter is not None:
             inclination = inclination_from_impact_parameter(
@@ -191,12 +236,6 @@ def build_kepler90(
         else:
             inclination = np.deg2rad(p["inclination_deg"]["value"])
             inclination_provenance = "published inclination"
-
-        # Phase the orbit from its measured transit epoch (see module docstring).
-        mean_anomaly_at_transit = transit_mean_anomaly(eccentricity, argument_of_periapsis)
-        mean_anomaly = mean_anomaly_at_transit + 2.0 * np.pi * (
-            epoch_bjd - transit_epoch
-        ) / period
 
         bodies.append(
             BodySpec(
@@ -213,6 +252,7 @@ def build_kepler90(
                     "letter": letter,
                     "kind": "planet",
                     "period_days": period,
+                    "osculating_period_days": osculating_period,
                     "transit_epoch_bjd": transit_epoch,
                     "mass_status": p["mass_earth"]["status"],
                     "impact_parameter": impact_parameter,
@@ -231,6 +271,7 @@ def build_kepler90(
                 "measured (g, h)" if use_measured_eccentricities else "adopted circular"
             ),
             "inclination_source": inclination_source,
+            "initial_conditions": initial_conditions,
             "contains_synthetic_body": False,
             "reference_dataset": ref.get("generated_utc"),
         }

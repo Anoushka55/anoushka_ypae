@@ -1,250 +1,142 @@
 """
-The full experiment, end to end.
+Phases 9-11 - the flagship experiment: one hidden planet, one dataset, one blind recovery.
 
-  1. Simulate the system WITH the synthetic Planet X (ground truth).
-  2. Generate an observer dataset: noisy transit times only.
-  3. Verify no ground truth leaked into that dataset.
-  4. Hand the dataset to the inference, which has never seen Planet X.
-  5. Compare the recovered parameters with the truth — only at the very end.
+  1. read the configuration (data/experiment_config.json), which holds Planet X's ground truth;
+  2. integrate the system WITH Planet X and sample its transits as Kepler sampled the real
+     system (real epochs, real per-transit uncertainties, noise from a seeded generator);
+  3. write the OBSERVER DATASET to data/observations.json - the only thing that crosses to the
+     inference - after asserting that it holds nothing but measurements;
+  4. run the inference on that dataset alone;
+  5. compare the recovery with the truth and write data/experiment_result.json, which the
+     autonomous demonstration displays. Nothing is displayed that this script did not compute.
 
-Run:
-  uv run --python 3.12 --extra dev python scripts/run_experiment.py
-  uv run --python 3.12 --extra dev python scripts/run_experiment.py --quick
+Run: uv run --python 3.12 --extra dev python scripts/run_experiment.py
 """
 
 from __future__ import annotations
 
 import argparse
 import json
+import time
 from pathlib import Path
 
 import numpy as np
 
-from invisible_planet.constants import SECONDS_PER_DAY
-from invisible_planet.experiments.config import DEFAULT_CONFIG
+from invisible_planet.constants import EARTH_MASS_IN_SOLAR, kepler_third_law_period
+from invisible_planet.experiments.config import load_config
+from invisible_planet.experiments.synthetic import simulate_observations
 from invisible_planet.inference.forward import ForwardModel
-from invisible_planet.inference.search import (
-    build_data_residuals,
-    null_hypothesis_chi2,
-    periodogram_search,
-    select_peaks,
-    verify_peaks_nonlinear,
-)
+from invisible_planet.inference.likelihood import TimingLikelihood
+from invisible_planet.inference.pipeline import equivalent_sigma, recover
+from invisible_planet.observations.dataset import assert_no_ground_truth_leakage, assert_parameters_absent
+from invisible_planet.observations.ttv import fit_linear_ephemeris
+from invisible_planet.systems.kepler90 import load_reference
 from invisible_planet.systems.planet_x import PlanetXParameters
-from invisible_planet.observations.dataset import (
-    ObserverDataset,
-    assert_no_ground_truth_leakage,
-    assert_parameters_absent,
-)
-from invisible_planet.observations.noise import (
-    TimingNoiseModel,
-    published_timing_uncertainties,
-)
-from invisible_planet.observations.transits import observe_transits
-from invisible_planet.observations.ttv import compare_ephemerides, fit_linear_ephemeris
-from invisible_planet.systems.kepler90 import build_kepler90, load_reference
-from invisible_planet.systems.planet_x import build_system_with_planet_x  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1]
 
-#: Planets used as timing probes. g and h are excluded: over a Kepler-length
-#: baseline they transit only 4 and 3 times, too few to support an ephemeris fit
-#: plus meaningful residuals.
-PROBE_PLANETS = ["b", "c", "i", "d", "e", "f"]
+
+def oc_minutes(times_bjd: np.ndarray, epochs: np.ndarray, sigma: np.ndarray) -> list:
+    """O-C in minutes about the weighted linear ephemeris fitted to `times_bjd` itself."""
+    fit = fit_linear_ephemeris(np.asarray(times_bjd), epochs=np.asarray(epochs), sigma=np.asarray(sigma))
+    return [float(x) for x in fit.residuals * 1440.0]
 
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--quick", action="store_true")
-    parser.add_argument("--seed", type=int, default=None)
-    parser.add_argument("--outdir", type=str, default="data")
+    parser.add_argument("--out", default="data/experiment_result.json")
     args = parser.parse_args()
 
-    config = DEFAULT_CONFIG
-    if args.seed is not None:
-        config.noise_seed = args.seed
+    config = load_config()
     reference = load_reference()
-    outdir = ROOT / args.outdir
+    truth: PlanetXParameters = config.planet_x
+    started = time.time()
 
-    print("=" * 74)
-    print("THE INVISIBLE PLANET — controlled numerical experiment")
-    print("=" * 74)
-    print("Planet X is SYNTHETIC. This is not a claim about the real Kepler-90.")
-    print()
-
-    # ---------------------------------------------------------------- step 1
-    truth = config.planet_x
-    mystery = build_system_with_planet_x(truth, reference=reference)
-    control = build_kepler90(reference=reference)
-
-    print("STEP 1 — simulate the system containing the unseen body")
-    print(f"  observation baseline : {config.observation_days:.0f} days")
-    print(f"  timestep             : {config.timestep_days:.6f} days")
-    print(f"  bodies               : {mystery.n_bodies} "
-          f"(star + 8 known planets + 1 unseen)")
-
-    probe_names = [f"Kepler-90 {letter}" for letter in PROBE_PLANETS]
-    mystery_series = observe_transits(
-        mystery, config.observation_days, config.timestep_days, tracked=probe_names
-    )
-    control_series = observe_transits(
-        control, config.observation_days, config.timestep_days, tracked=probe_names
-    )
-
-    print("\n  the signature Planet X imprints on the visible planets:")
-    print(f"  {'planet':>8} {'transits':>9} {'O-C ampl [min]':>15} {'O-C rms [s]':>12}")
-    for letter, name in zip(PROBE_PLANETS, probe_names):
-        result = compare_ephemerides(
-            control_series.for_planet(name), mystery_series.for_planet(name)
-        )
-        print(
-            f"  {letter:>8} {len(mystery_series.for_planet(name)):9d} "
-            f"{result['detrended_peak_to_peak_minutes']:15.2f} "
-            f"{result['detrended_rms_seconds']:12.1f}"
-        )
-
-    # ---------------------------------------------------------------- step 2
-    print("\nSTEP 2 — generate the observer dataset (noisy transit times only)")
-    sigmas = published_timing_uncertainties(reference, PROBE_PLANETS)
-    noise = TimingNoiseModel(sigmas, seed=config.noise_seed, scale=config.noise_scale)
-    print("  per-planet timing uncertainty, from the published values:")
-    for letter in PROBE_PLANETS:
-        print(f"    {letter}: {noise.sigma_seconds(letter):8.1f} s")
-
-    dataset = ObserverDataset.from_simulation(
-        series=mystery_series,
-        reference=reference,
-        planet_letters=PROBE_PLANETS,
-        noise_model=noise,
-        observation_days=config.observation_days,
-        epoch_bjd=config.epoch_bjd,
-        provenance={
-            "generator": "scripts/run_experiment.py",
-            "note": "Synthetic observations. The number of bodies is not disclosed.",
-        },
-    )
-    dataset_path = outdir / "observations.json"
-    dataset.save(dataset_path)
-    print(f"  wrote {dataset_path.relative_to(ROOT)}  ({dataset.counts()})")
-
-    # ---------------------------------------------------------------- step 3
-    print("\nSTEP 3 — verify no ground truth leaked into the observer dataset")
+    print("PLANET X IS SYNTHETIC - a controlled numerical experiment, not a claim about Kepler-90.\n")
+    dataset = simulate_observations(truth, seed=config.noise_seed, noise_scale=config.noise_scale, reference=reference)
     assert_no_ground_truth_leakage(dataset)
     assert_parameters_absent(dataset, truth)
-    print("  PASS: no forbidden identifier and no parameter VALUE of the hidden")
-    print("        body appears anywhere in the serialised dataset.")
+    dataset.save(ROOT / "data" / "observations.json")
+    print(f"observer dataset written: {dataset.counts()} transits (measurements only)\n")
 
-    # ---------------------------------------------------------------- step 4
-    print("\nSTEP 4 — inference (reads the dataset file only)")
-    reloaded = ObserverDataset.load(dataset_path)
-
-    null_chi2 = null_hypothesis_chi2(reloaded)
-    n_points = sum(
-        len(v) for v in reloaded.transit_times.values()
+    inf = config.inference
+    result = recover(
+        dataset, reference=reference, basis_cache=ROOT / "data" / "cache" / "periodogram_basis.npz",
+        fap_threshold=inf["fap_threshold"], n_peaks=inf["n_peaks"], n_null_trials=inf["n_null_trials"],
+        sample=True, n_walkers=inf["n_walkers"], n_steps=inf["n_steps"], seed=inf["sampler_seed"], verbose=True,
     )
-    print(f"  null hypothesis (no unseen planet): chi2 = {null_chi2:.1f} "
-          f"over ~{n_points} transits")
+    r = result.to_dict()
 
-    # ------------------------------------------------------------------
-    # Three stages. The design is driven by a measured property of the problem:
-    # the chi2 minimum is ~0.0005 au wide in semi-major axis, because a period
-    # error decorrelates the quasi-periodic TTV signal across the baseline. A
-    # coarse grid search cannot find it (an earlier version converged to a
-    # spurious minimum with a WORSE chi2 than the truth).
-    # ------------------------------------------------------------------
-    print("\n  stage 1 — periodogram: dense scan in period, mass and phase linearised")
-    # The chi2 minimum is ~0.0005 au wide (measured; see inference/search.py).
-    # The scan step must be FINER than that or the minimum is never sampled and
-    # the periodogram locks onto a noise peak instead — which is exactly what
-    # happened at 0.0016 au: it chose a = 0.1952 and returned a fit worse than
-    # the null hypothesis.
-    step = 0.0005 if args.quick else 0.00025
-    periodogram = periodogram_search(
-        reloaded, axis_min=0.16, axis_max=0.28, axis_step=step, verbose=True
-    )
-    localised = periodogram["best"]["semi_major_axis_au"]
-    print(f"    strongest period signal at a = {localised:.4f} au "
-          f"(delta chi2 = {periodogram['best']['delta_chi2_vs_null']:.1f})")
+    # ---- what the demonstration shows: observed / null-model / best-fit-model O-C -----------
+    likelihood = TimingLikelihood(dataset)
+    forward = ForwardModel(dataset, reference=reference)
+    control = forward.control()
+    best_model = None
+    if r["best_parameters"]:
+        best_model = forward.predict([PlanetXParameters.from_dict(r["best_parameters"])])[0]
+    per_planet = {}
+    chi2_null_by_planet = likelihood.chi2_per_planet(control)
+    chi2_best_by_planet = likelihood.chi2_per_planet(best_model) if best_model else None
+    for k in dataset.planet_letters:
+        epochs, sigma = dataset.epochs[k], dataset.timing_uncertainty_days[k]
+        per_planet[k] = {
+            "epochs": [int(e) for e in epochs],
+            "observed_bjd": [float(t) for t in dataset.transit_times_bjd[k]],
+            "sigma_minutes": [float(s * 1440.0) for s in sigma],
+            "observed_oc_minutes": oc_minutes(dataset.transit_times_bjd[k], epochs, sigma),
+            "visible_only_model_oc_minutes": oc_minutes(control[k], epochs, sigma),
+            "best_fit_model_oc_minutes": oc_minutes(best_model[k], epochs, sigma) if best_model else None,
+            "chi2_visible_only": chi2_null_by_planet[k],
+            "chi2_with_recovered_planet": chi2_best_by_planet[k] if chi2_best_by_planet else None,
+        }
 
-    print("\n  stage 2 — verify the strongest peaks with the FULL nonlinear model")
-    peaks = select_peaks(periodogram["periodogram"], n_peaks=5)
-    print(f"    {len(peaks)} well-separated peaks shortlisted. The linearised")
-    print("    ranking is NOT trusted on its own: a peak can score well there")
-    print("    and be catastrophically wrong under the real physics.")
-    verification = verify_peaks_nonlinear(reloaded, peaks, verbose=True)
-
-    winner = verification["best"]
-    best = winner["parameters"]
-    best_chi2 = winner["nonlinear_chi2"]
-
-    # 1-sigma interval on mass from delta chi2 = 1 (one free parameter)
-    mass_grid = np.asarray(winner["mass_grid"])
-    mass_scores = np.asarray(winner["mass_chi2"])
-    within = mass_grid[mass_scores <= best_chi2 + 1.0]
-    mass_interval = (float(within.min()), float(within.max())) if len(within) else None
-
-    data_residuals = build_data_residuals(reloaded)
-    n_points = sum(len(v["residuals"]) for v in data_residuals.values())
-    total_sims = (
-        periodogram["n_forward_simulations"] + verification["n_forward_simulations"]
-    )
-
-    print(f"\n  forward simulations run : {total_sims}")
-    print(f"  best chi2               : {best_chi2:.1f}")
-    print(f"  reduced chi2            : {best_chi2 / max(n_points - 3, 1):.2f}")
-    print(f"  improvement over null   : {null_chi2 - best_chi2:.1f} "
-          f"(~{np.sqrt(max(null_chi2 - best_chi2, 0.0)):.1f} sigma)")
-
-    # ---------------------------------------------------------------- step 5
-    print("\nSTEP 5 — compare with the truth (revealed only now)")
-    print(f"  {'parameter':>22} {'true':>12} {'recovered':>12} {'error':>12}")
-    rows = [
-        ("mass [M_earth]", truth.mass_earth, best.mass_earth),
-        ("semi-major axis [au]", truth.semi_major_axis_au, best.semi_major_axis_au),
-        ("mean anomaly [rad]", truth.mean_anomaly, best.mean_anomaly),
-    ]
-    for label, true_value, recovered in rows:
-        print(f"  {label:>22} {true_value:12.4f} {recovered:12.4f} "
-              f"{recovered - true_value:+12.4f}")
-
+    # ---- comparison with the truth (this is the ONLY place truth and recovery meet) ---------
     m_star = reference["star"]["mass_solar"]["value"]
-    true_period = truth.period_days(m_star + truth.mass_solar)
-    recovered_period = best.period_days(m_star + best.mass_solar)
-    print(f"  {'period [days]':>22} {true_period:12.4f} {recovered_period:12.4f} "
-          f"{recovered_period - true_period:+12.4f}")
+    p_true = truth.period_days(m_star + truth.mass_solar)
+    comparison = None
+    if r["best_parameters"]:
+        best = r["best_parameters"]
+        p_best = kepler_third_law_period(best["semi_major_axis_au"], m_star + best["mass_earth"] * EARTH_MASS_IN_SOLAR)
+        comparison = {"period_true_days": p_true, "period_recovered_days": p_best,
+                      "period_relative_error": (p_best - p_true) / p_true}
+        summary = r["posterior"]["summary"] if r["posterior"] else None
+        if summary:
+            def inside(name, value, lo="2.5", hi="97.5"):
+                return bool(summary[name][lo] <= value <= summary[name][hi])
+            comparison["truth_inside_95pct_interval"] = {
+                "mass_earth": inside("mass_earth", truth.mass_earth),
+                "semi_major_axis_au": inside("semi_major_axis_au", truth.semi_major_axis_au),
+                "period_days": inside("period_days", p_true),
+                "eccentricity": inside("eccentricity", truth.eccentricity),
+            }
 
-    if mass_interval is not None:
-        print(f"\n  mass 1-sigma interval (delta chi2 < 1): "
-              f"{mass_interval[0]:.1f} to {mass_interval[1]:.1f} M_earth")
-        inside = mass_interval[0] <= truth.mass_earth <= mass_interval[1]
-        print(f"  the true mass ({truth.mass_earth:.1f}) lies "
-              f"{'INSIDE' if inside else 'OUTSIDE'} that interval")
-        print("  note: mass is the weakly constrained parameter; the chi2 curve")
-        print("        is shallow in mass and extremely sharp in period.")
-
-    out = {
-        "warning": "Planet X is synthetic. Not a claim about the real Kepler-90.",
+    output = {
+        "planet_x_is_synthetic": True,
+        "warning": "Planet X is not real and is not a claim about Kepler-90.",
         "config": config.to_dict(include_ground_truth=True),
-        "probe_planets": PROBE_PLANETS,
-        "null_hypothesis_chi2": null_chi2,
-        "periodogram_best": periodogram["best"],
-        "verified_peaks": [
-            {k: v for k, v in p.items() if k != "parameters"}
-            for p in verification["peaks"]
-        ],
-        "best_parameters": best.to_dict(),
-        "best_chi2": best_chi2,
-        "mass_one_sigma_interval": mass_interval,
-        "n_forward_simulations": total_sims,
-        "errors": {
-            "mass_earth": best.mass_earth - truth.mass_earth,
-            "semi_major_axis_au": best.semi_major_axis_au - truth.semi_major_axis_au,
-            "period_days": recovered_period - true_period,
-        },
+        "ground_truth": truth.to_dict(),
+        "true_period_days": p_true,
+        "inference": {k: v for k, v in r.items()},
+        "observations": per_planet,
+        "comparison": comparison,
+        "wall_seconds": time.time() - started,
     }
-    path = outdir / "experiment_result.json"
-    path.write_text(json.dumps(out, indent=2), encoding="utf-8")
-    print(f"\nWROTE {path.relative_to(ROOT)}")
+    (ROOT / args.out).write_text(json.dumps(output, indent=1, default=float), encoding="utf-8")
+
+    print("\n" + "=" * 72)
+    print("RESULT (SYNTHETIC Planet X)")
+    print("=" * 72)
+    print(f"detected: {r['detected']}   false-alarm probability {r['false_alarm_probability']:.2e} "
+          f"(~{equivalent_sigma(r['false_alarm_probability']):.1f} sigma)")
+    print(f"chi2: visible-only {r['chi2_null']:.1f}  ->  with recovered planet {r['best_chi2']}   (n = {r['n_points']})")
+    if r["best_parameters"]:
+        b = r["best_parameters"]
+        print(f"recovered (best fit): m = {b['mass_earth']:.1f} M_earth, a = {b['semi_major_axis_au']:.4f} au, "
+              f"P = {comparison['period_recovered_days']:.3f} d")
+        print(f"truth               : m = {truth.mass_earth:.1f} M_earth, a = {truth.semi_major_axis_au:.4f} au, "
+              f"P = {p_true:.3f} d")
+        print(f"period error {comparison['period_relative_error']:+.3%}")
+    print(f"\nwritten {args.out} ({time.time() - started:.0f} s)")
 
 
 if __name__ == "__main__":

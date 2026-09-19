@@ -113,43 +113,42 @@ def test_isolated_planet_has_negligible_oc_residuals(letter, reference):
 
 
 def test_fitted_period_offset_is_the_known_symplectic_frequency_shift(reference):
-    """The fitted period differs from the input period by a known O(dt^2) amount.
+    """The timestep-dependent part of the fitted period is the O(dt^2) symplectic frequency shift.
 
-    A symplectic integrator follows a nearby "shadow" Hamiltonian whose orbital
-    frequency differs from the true one at O(dt^2) (docs/NUMERICAL_METHODS.md).
-    At the production timestep this shows up as a fitted period ~3e-6 larger
-    than the catalogue value — about 4 seconds per orbit for planet i.
+    A symplectic integrator follows a nearby "shadow" Hamiltonian whose orbital frequency differs
+    from the true one at O(dt^2) (docs/NUMERICAL_METHODS.md).
 
-    Rather than assert an arbitrary bound, this test verifies the offset is
-    THAT effect and not a bug, by checking it shrinks as dt^2 when the timestep
-    is refined. A coding error (wrong mu, wrong epoch, bad root find) would not
-    obey that scaling.
+    The fitted period ALSO differs from the catalogue period by a dt-independent amount (the
+    catalogue semi-major axis omits the planet's mass and uses the 4 pi^2 shortcut for G M, and the
+    osculating period differs from the mean transit period; see docs/UNITS.md). That constant is
+    not the subject of this test and would mask the scaling if compared with the catalogue.
 
-    Why this does not harm the science: the offset is a constant rescaling of
-    the period, and every transit-timing analysis — this one and every real one
-    — FITS the period rather than assuming it. A constant period offset is
-    absorbed exactly by the fitted P and cancels out of the O-C residuals, which
-    is verified directly in the test below.
+    So the test isolates the dt-dependent part by DIFFERENCING successive halvings, which removes
+    any constant: P(dt) - P(dt/2) = C dt^2 (1 - 1/4) and P(dt/2) - P(dt/4) = C dt^2 (1/4 - 1/16),
+    so the ratio of the two differences must be 4 for a second-order method. A coding error (wrong
+    mu, wrong epoch, bad root find) would not obey that scaling.
+
+    The magnitude is bounded by the requirement that the shift at the production timestep be
+    below 1e-5 of the period (the shift is fitted away as part of the linear ephemeris, exactly as
+    with real data, and verified to cancel in the O-C test below).
     """
     letter = "i"
-    catalogue = reference["planets"][letter]["orbital_period_days"]["value"]
     system = build_kepler90(planets=[letter], reference=reference)
     base_dt = recommended_timestep(reference)
 
-    offsets = []
+    periods = []
     for divisor in [1.0, 2.0, 4.0]:
         series = observe_transits(system, BASELINE_DAYS, base_dt / divisor)
-        fit = fit_linear_ephemeris(series.times[0])
-        offsets.append(abs(fit.period - catalogue) / catalogue)
+        periods.append(fit_linear_ephemeris(series.times[0]).period)
 
-    assert offsets[0] < 1e-5, f"period offset {offsets[0]:.2e} larger than expected"
-    # halving dt must reduce the offset by ~4x
-    for coarse, fine in zip(offsets, offsets[1:]):
-        ratio = coarse / fine
-        assert 3.0 < ratio < 5.5, (
-            f"period offset scales as {ratio:.2f}x per halving, not ~4x — this is "
-            f"not the expected O(dt^2) behaviour. offsets: {offsets}"
-        )
+    d1, d2 = periods[0] - periods[1], periods[1] - periods[2]
+    ratio = d1 / d2
+    assert 3.5 < ratio < 4.5, (
+        f"period shift scales as {ratio:.2f}x per halving, not 4x - not the expected O(dt^2) "
+        f"behaviour. periods: {periods}"
+    )
+    shift_at_production_dt = abs(d1) * (4.0 / 3.0) / periods[0]      # C dt^2 = (P(dt) - P(dt/2)) * 4/3
+    assert shift_at_production_dt < 1e-5, f"symplectic period shift {shift_at_production_dt:.2e} larger than expected"
 
 
 def test_oc_residuals_are_insensitive_to_timestep(reference):

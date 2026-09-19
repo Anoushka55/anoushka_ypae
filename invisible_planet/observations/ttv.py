@@ -105,12 +105,24 @@ def assign_epochs(times: np.ndarray, period_guess: float | None = None) -> np.nd
 
 
 def fit_linear_ephemeris(
-    times: np.ndarray, period_guess: float | None = None
+    times: np.ndarray,
+    period_guess: float | None = None,
+    epochs: np.ndarray | None = None,
+    sigma: np.ndarray | None = None,
 ) -> LinearEphemeris:
-    """Least-squares fit of T_n = T_0 + n P, returning the O-C residuals.
+    """Weighted least-squares fit of T_n = T_0 + n P, returning the O-C residuals.
 
-    Requires at least three transits: two determine the line exactly and would
-    leave identically zero residuals, which would be meaningless.
+    Parameters
+    ----------
+    times : transit times [days].
+    epochs : integer transit numbers. If omitted they are inferred from the spacing,
+        which fails when gaps dominate; real, gappy data should always pass them.
+    sigma : per-transit 1-sigma uncertainties [days]. If omitted the fit is unweighted.
+        With `sigma` the parameter uncertainties are the formal ones (they are NOT
+        rescaled by the reduced chi-squared, which is reported separately by callers).
+
+    Requires at least three transits: two determine the line exactly and would leave
+    identically zero residuals, which would be meaningless.
     """
     times = np.asarray(times, dtype=np.float64)
     if len(times) < 3:
@@ -118,30 +130,83 @@ def fit_linear_ephemeris(
             f"need at least 3 transits to measure O-C residuals, got {len(times)}"
         )
 
-    epochs = assign_epochs(times, period_guess)
+    epochs = (
+        assign_epochs(times, period_guess)
+        if epochs is None
+        else np.asarray(epochs, dtype=np.int64)
+    )
+    if len(epochs) != len(times):
+        raise ValueError("epochs and times must have the same length")
 
-    # design matrix for [T_0, P]
-    design = np.vstack([np.ones_like(epochs, dtype=np.float64), epochs.astype(np.float64)]).T
-    solution, _, _, _ = np.linalg.lstsq(design, times, rcond=None)
-    t0, period = float(solution[0]), float(solution[1])
+    weights = (
+        np.ones(len(times))
+        if sigma is None
+        else 1.0 / np.asarray(sigma, dtype=np.float64) ** 2
+    )
+
+    # Fit about the weighted-mean epoch: the intercept and slope are then
+    # uncorrelated and the normal equations are well conditioned even when the
+    # epochs run to hundreds (planet b) or when the sequence has large gaps.
+    mean_epoch = float(np.sum(weights * epochs) / np.sum(weights))
+    x = epochs.astype(np.float64) - mean_epoch
+    design = np.vstack([np.ones_like(x), x]).T
+    normal = design.T @ (weights[:, None] * design)
+    t_ref, period = np.linalg.solve(normal, design.T @ (weights * times))
+    t0 = float(t_ref - period * mean_epoch)
 
     model = t0 + period * epochs
     residuals = times - model
 
-    # formal parameter uncertainties from the fit residuals
-    dof = max(len(times) - 2, 1)
-    variance = float(np.sum(residuals**2) / dof)
-    covariance = variance * np.linalg.inv(design.T @ design)
+    covariance_unit_weights = np.linalg.inv(normal)
+    if sigma is None:
+        dof = max(len(times) - 2, 1)
+        variance = float(np.sum(residuals**2) / dof)
+        covariance = variance * covariance_unit_weights
+        cov_t0 = covariance[0, 0] + mean_epoch**2 * covariance[1, 1] - 2 * mean_epoch * covariance[0, 1]
+        cov_p = covariance[1, 1]
+    else:
+        covariance = covariance_unit_weights
+        cov_t0 = covariance[0, 0] + mean_epoch**2 * covariance[1, 1] - 2 * mean_epoch * covariance[0, 1]
+        cov_p = covariance[1, 1]
 
     return LinearEphemeris(
         t0=t0,
-        period=period,
-        t0_uncertainty=float(np.sqrt(covariance[0, 0])),
-        period_uncertainty=float(np.sqrt(covariance[1, 1])),
+        period=float(period),
+        t0_uncertainty=float(np.sqrt(cov_t0)),
+        period_uncertainty=float(np.sqrt(cov_p)),
         epochs=epochs,
         times=times,
         residuals=residuals,
     )
+
+
+def profile_chi2(
+    data_times: np.ndarray,
+    model_times: np.ndarray,
+    sigma: np.ndarray,
+    epochs: np.ndarray,
+) -> tuple[float, int]:
+    """Chi-squared of a model against data with the linear ephemeris profiled out.
+
+    The observer never knows a planet's true period and phase, so a candidate model
+    is judged only up to a per-planet straight line in epoch number:
+
+        chi2 = min over (a, b)  sum_n [ (data_n - model_n - a - b n) / sigma_n ]^2
+
+    This is the correct statistic for O-C analysis with GAPS and UNEQUAL weights.
+    Fitting the ephemeris separately to the model and to the data would be wrong in
+    that case, because the two fits would use different weights or epochs. Returns
+    (chi2, degrees_of_freedom_removed=2).
+    """
+    r = np.asarray(data_times, dtype=np.float64) - np.asarray(model_times, dtype=np.float64)
+    n = np.asarray(epochs, dtype=np.float64)
+    w = 1.0 / np.asarray(sigma, dtype=np.float64) ** 2
+    mean_epoch = float(np.sum(w * n) / np.sum(w))
+    design = np.vstack([np.ones_like(n), n - mean_epoch]).T
+    normal = design.T @ (w[:, None] * design)
+    coefficients = np.linalg.solve(normal, design.T @ (w * r))
+    residual = r - design @ coefficients
+    return float(np.sum(w * residual**2)), 2
 
 
 def ttv_amplitude_minutes(times: np.ndarray, period_guess: float | None = None) -> float:

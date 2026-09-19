@@ -31,8 +31,11 @@ Yes — and this is established science, not speculation:
 - **Kepler-19c (2011)** was identified purely from transit timing variations induced
   in Kepler-19b. It does not transit. It was invisible.
 - **Kepler-90 g and h** — two of the eight real planets in *this* system — have masses
-  known only because they perturb each other's transit times (Liang et al. 2021;
-  Shaw et al. 2025).
+  measured from the transit timing variations they induce in each other (Liang et al.
+  2021; Shaw et al. 2025 lists the same central values). Other published values differ
+  (Weiss et al. 2024 gives M sin i with large errors; an older population study lists
+  round values with no uncertainty), so even these masses are not uniquely established
+  — see `docs/KEPLER90_DATA.md`, CHECK 6.
 
 ## 3. Kepler-90 background
 
@@ -50,7 +53,7 @@ strong transit timing variations.
 |---|---|
 | The star's mass and radius | Planet X's mass |
 | The eight planets' periods, radii, transit epochs, impact parameters | Planet X's orbit |
-| Measured masses of planets g and h (from TTVs) | — |
+| Masses of planets g and h (TTV dynamical masses, with source tension noted) | — |
 | Published transit-timing uncertainties (used as the noise model) | — |
 
 Every real value carries a source, an uncertainty and a status flag
@@ -95,9 +98,13 @@ is ~86 s — the same order as the signals being measured — so f32 would manuf
 **au / day / M☉**, with **G = 2.959122081921 × 10⁻⁴ au³ M☉⁻¹ day⁻²** derived from the
 IAU 2015 nominal GM☉ and cross-checked against the Gaussian constant *k*² to 3 × 10⁻¹⁰.
 
-The textbook shortcut G M☉ = 4π² au³ yr⁻² is **rejected**: it is wrong by 3.8 × 10⁻⁵,
-which is ~8 minutes of coherent timing drift on Kepler-90 h — right on top of the
-signal. See **[docs/UNITS.md](docs/UNITS.md)**.
+The shortcut G M☉ = 4π² au³ yr⁻² differs from this value by 3.8 × 10⁻⁵ (it uses a
+365.25-day year where the Gaussian constant implies 365.2569 d). Used *consistently* it
+would not change any transit time; it matters because **published semi-major axes embed
+it** (the Weiss et al. values equal (M★P²)^(1/3) with P in Julian years to 10⁻⁹), so
+mixing such an `a` with a different G mis-sets the period by up to ~9 minutes per orbit of
+Kepler-90 h. This project avoids that by deriving `a` from the measured period with a
+single G. See **[docs/UNITS.md](docs/UNITS.md)** (generated; every number is computed).
 
 ## 8. Transits and O−C
 
@@ -236,7 +243,8 @@ Two data problems were found and fixed rather than absorbed:
 1. **Kepler-90 h's published inclination (89.60°) implies b = 1.23 — it would never
    transit**, contradicting its discovery by transit. The same paper's impact
    parameter (0.36) is self-consistent. Inclination is now derived from *b*.
-2. **The catalogue's semi-major axes omit the planet mass** (they use `a³ = GM★P²/4π²`).
+2. **The catalogue's semi-major axes omit the planet mass** and embed the 4π² shortcut
+   (they equal `(M★ P_yr²)^(1/3)` to 10⁻⁹).
    For h that distorts the period by 2.2 hours per orbit. `a` is now derived from the
    measured period using the correct total mass.
 
@@ -269,7 +277,7 @@ uv run --python 3.12 --extra dev python scripts/build_reference_dataset.py
 | Cabrera et al. (2014), ApJ 781, 18 | transit epochs, impact parameters (b–h) |
 | Shallue & Vanderburg (2018), AJ 155, 94 | Kepler-90 i discovery parameters |
 | Liang et al. (2021), AJ 161, 202 | TTV dynamical masses of g and h |
-| Shaw et al. (2025), AJ 170, 146 | independent TTV cross-check |
+| Shaw et al. (2025), AJ 170, 146 | TTV masses of g and h (same central values as Liang et al.) |
 | Fulton & Petigura (2018), AJ 156, 264 | stellar mass and radius |
 | Weiss & Marcy (2014), ApJ 783, L6 | mass–radius relation for the massless planets |
 

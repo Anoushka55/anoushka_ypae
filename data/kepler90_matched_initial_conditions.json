@@ -1,0 +1,139 @@
+{
+  "description": "Initial osculating period and mean anomaly of each Kepler-90 planet, fitted to the real transit times (scripts/match_visible_system.py, systems/matching.py).",
+  "epoch_bjd": 2454964.5,
+  "duration_days": 1459.5,
+  "integration_steps_per_inner_orbit": 4000,
+  "planets": {
+    "b": {
+      "osculating_period_days": 7.009956781658483,
+      "mean_anomaly_rad": 2.3027063758893322,
+      "catalogue_period_days": 7.00828076,
+      "osculating_minus_catalogue_period_rel": 0.00023914876071295943,
+      "fitted_mean_transit_period_days": 7.008280742432148
+    },
+    "c": {
+      "osculating_period_days": 8.718747568623023,
+      "mean_anomaly_rad": 2.0409855471047216,
+      "catalogue_period_days": 8.71982853,
+      "osculating_minus_catalogue_period_rel": -0.00012396589832674998,
+      "fitted_mean_transit_period_days": 8.719828505914654
+    },
+    "i": {
+      "osculating_period_days": 14.451252901737345,
+      "mean_anomaly_rad": 1.2489146671357882,
+      "catalogue_period_days": 14.44912,
+      "osculating_minus_catalogue_period_rel": 0.00014761464624446496,
+      "fitted_mean_transit_period_days": 14.449119976729667
+    },
+    "d": {
+      "osculating_period_days": 59.731135624997115,
+      "mean_anomaly_rad": 4.966676658286393,
+      "catalogue_period_days": 59.7370348,
+      "osculating_minus_catalogue_period_rel": -9.875239075118891e-05,
+      "fitted_mean_transit_period_days": 59.736795539859195
+    },
+    "e": {
+      "osculating_period_days": 91.9905994850256,
+      "mean_anomaly_rad": 1.377275494161128,
+      "catalogue_period_days": 91.9404603,
+      "osculating_minus_catalogue_period_rel": 0.0005453440722615888,
+      "fitted_mean_transit_period_days": 91.93830040247892
+    },
+    "f": {
+      "osculating_period_days": 124.9840956319784,
+      "mean_anomaly_rad": 1.6573698349616608,
+      "catalogue_period_days": 124.916337,
+      "osculating_minus_catalogue_period_rel": 0.0005424321078066896,
+      "fitted_mean_transit_period_days": 124.91633348231288
+    },
+    "g": {
+      "osculating_period_days": 211.4011241030428,
+      "mean_anomaly_rad": 1.1062705575987135,
+      "catalogue_period_days": 210.6031105,
+      "osculating_minus_catalogue_period_rel": 0.0037891824159110854,
+      "fitted_mean_transit_period_days": 210.7194315262937
+    },
+    "h": {
+      "osculating_period_days": 331.81196209081696,
+      "mean_anomaly_rad": 1.400844620376519,
+      "catalogue_period_days": 331.6011081,
+      "osculating_minus_catalogue_period_rel": 0.0006358663637318074,
+      "fitted_mean_transit_period_days": 331.6079574863426
+    }
+  },
+  "fit": {
+    "final_cost": 38.65531484174227,
+    "history": [
+      {
+        "iteration": 0,
+        "cost": 393472.99483709334
+      },
+      {
+        "iteration": 1,
+        "cost": 40.899782415272
+      },
+      {
+        "iteration": 2,
+        "cost": 38.65531507626751
+      },
+      {
+        "iteration": 3,
+        "cost": 38.65531484174227
+      }
+    ],
+    "residual_detail": {
+      "d": {
+        "chi2": 17.74834870615464,
+        "chi2_published_sigma": 17.74834870615464,
+        "n": 16,
+        "missing": 0,
+        "rms_minutes": 10.983609551042218
+      },
+      "e": {
+        "chi2": 45.136325917683756,
+        "chi2_published_sigma": 45.136325917683756,
+        "n": 12,
+        "missing": 0,
+        "rms_minutes": 28.764475784552065
+      },
+      "g": {
+        "chi2": 4.944353726646116,
+        "chi2_published_sigma": 5514.092935014285,
+        "n": 6,
+        "missing": 0,
+        "rms_minutes": 54.503187600288626
+      },
+      "h": {
+        "chi2": 9.481555284748012,
+        "chi2_published_sigma": 9.481555284748012,
+        "n": 3,
+        "missing": 0,
+        "rms_minutes": 3.337846784690155
+      },
+      "b": {
+        "chi2": 1.0424664250019512e-07,
+        "n": 2,
+        "period_rel_offset": -2.5067277786931362e-09,
+        "epoch_offset_seconds": -0.0351637601852417
+      },
+      "c": {
+        "chi2": 9.225467601271979e-08,
+        "n": 2,
+        "period_rel_offset": -2.7621351946195957e-09,
+        "epoch_offset_seconds": -0.02510547637939453
+      },
+      "i": {
+        "chi2": 5.923648079851744e-08,
+        "n": 2,
+        "period_rel_offset": -1.6105017617625835e-09,
+        "epoch_offset_seconds": 0.07567852735519409
+      },
+      "f": {
+        "chi2": 4.579251421696003e-05,
+        "n": 2,
+        "period_rel_offset": -2.8160344786365605e-08,
+        "epoch_offset_seconds": -7.442969083786011
+      }
+    }
+  }
+}

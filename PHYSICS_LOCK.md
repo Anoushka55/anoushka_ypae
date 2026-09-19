@@ -35,7 +35,7 @@ Implemented once, in `invisible_planet/physics/engine.py::NBodyEngine._integrate
 | R⊕ | 6.3781×10⁶ m | IAU 2015 nominal |
 
 G is cross-checked against the Gaussian constant k² to 3×10⁻¹⁰.
-**G M☉ = 4π² au³/yr² is explicitly rejected** (wrong by 3.8×10⁻⁵).
+The shortcut G M☉ = 4π² au³/yr² (3.8×10⁻⁵ from G) is not used; published `a` values embed it, so `a` is always derived here from the measured period with this G (see docs/UNITS.md).
 
 Defined in exactly one place: `invisible_planet/constants.py`.
 

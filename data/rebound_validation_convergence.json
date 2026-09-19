@@ -1,0 +1,142 @@
+[
+  {
+    "days": 400.0,
+    "dt": 0.00350414038,
+    "steps_per_inner_orbit": 2000,
+    "planets": {
+      "Kepler-90 b": {
+        "n_engine": 57,
+        "n_rebound": 57,
+        "raw_diff_max_s": 115.63180734337948,
+        "period_diff_rel": 3.397220772860081e-06,
+        "oc_diff_max_s": 0.7015046004696046,
+        "oc_diff_rms_s": 0.30575053844192895,
+        "oc_signal_rms_s": 109.68121615688176
+      },
+      "Kepler-90 c": {
+        "n_engine": 46,
+        "n_rebound": 46,
+        "raw_diff_max_s": 71.05875565830502,
+        "period_diff_rel": 2.03841373694279e-06,
+        "oc_diff_max_s": 0.5346202862682503,
+        "oc_diff_rms_s": 0.23625052201102892,
+        "oc_signal_rms_s": 85.26429878191722
+      },
+      "Kepler-90 i": {
+        "n_engine": 27,
+        "n_rebound": 27,
+        "raw_diff_max_s": 26.108319473132724,
+        "period_diff_rel": 7.73779735592462e-07,
+        "oc_diff_max_s": 0.021567047770076897,
+        "oc_diff_rms_s": 0.009618077756498184,
+        "oc_signal_rms_s": 24.904621068969256
+      },
+      "Kepler-90 d": {
+        "n_engine": 7,
+        "n_rebound": 7,
+        "raw_diff_max_s": 1.468888350063935,
+        "period_diff_rel": 4.51187247992402e-08,
+        "oc_diff_max_s": 0.0016992458768072538,
+        "oc_diff_rms_s": 0.000895734825308238,
+        "oc_signal_rms_s": 265.0981596044853
+      },
+      "Kepler-90 e": {
+        "n_engine": 5,
+        "n_rebound": 5,
+        "raw_diff_max_s": 0.6117182265370502,
+        "period_diff_rel": 1.9307947480605058e-08,
+        "oc_diff_max_s": 0.0018940318113891408,
+        "oc_diff_rms_s": 0.001221339614550123,
+        "oc_signal_rms_s": 397.02682468755796
+      },
+      "Kepler-90 f": {
+        "n_engine": 3,
+        "n_rebound": 3,
+        "raw_diff_max_s": 0.34001344265561784,
+        "period_diff_rel": 1.0466352794942326e-08,
+        "oc_diff_max_s": 0.001542185873404378,
+        "oc_diff_rms_s": 0.001090490088934795,
+        "oc_signal_rms_s": 463.10024007264394
+      },
+      "Kepler-90 g": {
+        "n_engine": 2,
+        "n_rebound": 2
+      },
+      "Kepler-90 h": {
+        "n_engine": 2,
+        "n_rebound": 2
+      }
+    },
+    "max_position_difference_au": 9.112674811640938e-05
+  },
+  {
+    "days": 400.0,
+    "dt": 0.00175207019,
+    "steps_per_inner_orbit": 4000,
+    "planets": {
+      "Kepler-90 b": {
+        "n_engine": 57,
+        "n_rebound": 57,
+        "raw_diff_max_s": 28.908470645365014,
+        "period_diff_rel": 8.493185045022249e-07,
+        "oc_diff_max_s": 0.1755181468197975,
+        "oc_diff_rms_s": 0.07650786139218423,
+        "oc_signal_rms_s": 109.68121615688176
+      },
+      "Kepler-90 c": {
+        "n_engine": 46,
+        "n_rebound": 46,
+        "raw_diff_max_s": 17.76421374415804,
+        "period_diff_rel": 5.09590972923185e-07,
+        "oc_diff_max_s": 0.13378341035945596,
+        "oc_diff_rms_s": 0.05910965903797363,
+        "oc_signal_rms_s": 85.26429878191722
+      },
+      "Kepler-90 i": {
+        "n_engine": 27,
+        "n_rebound": 27,
+        "raw_diff_max_s": 6.52707194640243,
+        "period_diff_rel": 1.9344491238257963e-07,
+        "oc_diff_max_s": 0.005389329635363538,
+        "oc_diff_rms_s": 0.002404833114110085,
+        "oc_signal_rms_s": 24.904621068969256
+      },
+      "Kepler-90 d": {
+        "n_engine": 7,
+        "n_rebound": 7,
+        "raw_diff_max_s": 0.36721482865686994,
+        "period_diff_rel": 1.1279493741520533e-08,
+        "oc_diff_max_s": 0.00042466290324227884,
+        "oc_diff_rms_s": 0.00022369974095486417,
+        "oc_signal_rms_s": 265.0981596044853
+      },
+      "Kepler-90 e": {
+        "n_engine": 5,
+        "n_rebound": 5,
+        "raw_diff_max_s": 0.15292598491214449,
+        "period_diff_rel": 4.826927219734108e-09,
+        "oc_diff_max_s": 0.000476172317576129,
+        "oc_diff_rms_s": 0.00030599902814344043,
+        "oc_signal_rms_s": 397.02682468755796
+      },
+      "Kepler-90 f": {
+        "n_engine": 3,
+        "n_rebound": 3,
+        "raw_diff_max_s": 0.08500367130181985,
+        "period_diff_rel": 2.6165888528216516e-09,
+        "oc_diff_max_s": 0.000381988866138272,
+        "oc_diff_rms_s": 0.00027010373423197556,
+        "oc_signal_rms_s": 463.10024007264394
+      },
+      "Kepler-90 g": {
+        "n_engine": 2,
+        "n_rebound": 2
+      },
+      "Kepler-90 h": {
+        "n_engine": 2,
+        "n_rebound": 2
+      }
+    },
+    "max_position_difference_au": 2.2782403452378453e-05
+  }
+]

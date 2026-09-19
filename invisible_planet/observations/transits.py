@@ -33,6 +33,42 @@ class TransitSeries:
         return {n: len(t) for n, t in zip(self.names, self.times)}
 
 
+# ---------------------------------------------------------------------------------------
+# ENGINE REUSE
+# Every NBodyEngine allocates Taichi fields, and Taichi allows only a fixed number of field
+# allocations ("SNode trees", 512 on the CPU backend) per process. A long inference evaluates
+# thousands of batches; building a fresh engine for each crashed the process (access violation)
+# after ~170 engines. Engines are therefore REUSED: keyed by everything that shapes them, and
+# ensemble sizes are rounded up to a small set of bucket sizes (the extra members repeat the
+# last system; ensemble members are independent, so this cannot change any result).
+# ---------------------------------------------------------------------------------------
+_BUCKETS = (1, 2, 4, 8, 16, 32, 48)
+_ENGINES: dict = {}
+
+
+def _bucket(k: int) -> int:
+    for size in _BUCKETS:
+        if k <= size:
+            return size
+    return k
+
+
+def _engine_for(n_bodies, k, tracked_indices, max_transits, stellar_radius, planet_radii) -> NBodyEngine:
+    key = (int(n_bodies), int(k), tuple(tracked_indices), int(max_transits), float(stellar_radius),
+           tuple(float(r) for r in planet_radii))
+    engine = _ENGINES.get(key)
+    if engine is None:
+        engine = NBodyEngine(n_bodies=n_bodies, n_ensembles=k)
+        engine.enable_transit_detection(
+            tracked_bodies=tracked_indices, max_transits=max_transits, central_index=0,
+            stellar_radius=float(stellar_radius), planet_radii=np.asarray(planet_radii),
+        )
+        _ENGINES[key] = engine
+    else:
+        engine.reset_transits()
+    return engine
+
+
 def observe_transits_batch(
     systems: list,
     duration_days: float,
@@ -60,18 +96,14 @@ def observe_transits_batch(
     tracked_indices = [systems[0].index_of(n) for n in tracked_names]
 
     k = len(systems)
-    masses = np.stack([s.masses for s in systems])
-    positions = np.stack([s.positions for s in systems])
-    velocities = np.stack([s.velocities for s in systems])
+    k_engine = _bucket(k)
+    padded = list(systems) + [systems[-1]] * (k_engine - k)
+    masses = np.stack([s.masses for s in padded])
+    positions = np.stack([s.positions for s in padded])
+    velocities = np.stack([s.velocities for s in padded])
 
-    engine = NBodyEngine(n_bodies=n_bodies, n_ensembles=k)
-    engine.enable_transit_detection(
-        tracked_bodies=tracked_indices,
-        max_transits=max_transits,
-        central_index=0,
-        stellar_radius=float(systems[0].radii[0]),
-        planet_radii=np.asarray([systems[0].radii[i] for i in tracked_indices]),
-    )
+    engine = _engine_for(n_bodies, k_engine, tracked_indices, max_transits, systems[0].radii[0],
+                         [systems[0].radii[i] for i in tracked_indices])
     engine.set_state(masses, positions, velocities, time=0.0)
     engine.run(timestep_days, int(round(duration_days / timestep_days)))
 
@@ -103,30 +135,5 @@ def observe_transits(
     Times are returned in DAYS SINCE THE EPOCH of the system, matching the
     convention used throughout the project. Add `system.epoch` to convert to BJD.
     """
-    tracked_names = tracked if tracked is not None else system.names[1:]
-    tracked_indices = [system.index_of(n) for n in tracked_names]
-
-    engine = NBodyEngine(n_bodies=system.n_bodies)
-    engine.enable_transit_detection(
-        tracked_bodies=tracked_indices,
-        max_transits=max_transits,
-        central_index=0,
-        stellar_radius=float(system.radii[0]),
-        planet_radii=np.asarray([system.radii[i] for i in tracked_indices]),
-    )
-    engine.set_state(system.masses, system.positions, system.velocities, time=0.0)
-
-    n_steps = int(round(duration_days / timestep_days))
-    engine.run(timestep_days, n_steps)
-
-    times = engine.get_transit_times()[0]
-    impacts = engine.get_transit_impact_parameters()[0]
-
-    return TransitSeries(
-        names=list(tracked_names),
-        times=times,
-        impact_parameters=impacts,
-        span_days=engine.time,
-        timestep_days=timestep_days,
-        epoch_bjd=system.epoch,
-    )
+    return observe_transits_batch([system], duration_days, timestep_days, tracked=tracked,
+                                  max_transits=max_transits)[0]

@@ -1,21 +1,21 @@
 """
 Measurement noise model.
 
-Phase 9 deliverable.
-
     observation = true_value + noise
 
-THE NOISE IS NOT INVENTED. Each planet's per-transit timing uncertainty is taken
-from the published transit-epoch uncertainty for that planet in the reference
-dataset, so the synthetic data inherits the real system's precision structure:
-planet h is measured to ~71 s, planet f only to ~1210 s. A single made-up
-constant would misrepresent how well this system is actually known, and would
-make the inference look either easier or harder than reality.
+THE NOISE IS NOT INVENTED. Each transit that Kepler actually measured is given the 1-sigma
+timing uncertainty that was PUBLISHED for that transit (Holczer et al. 2016 for planets d
+and e; Liang et al. 2021 for g and h). See docs/OBSERVING_PATTERN.md, which also compares
+these against the analytic photon-noise limit of Carter et al. (2008): the published errors
+are 2.1-2.9x that limit.
 
-The noise is Gaussian and independent between transits. Real transit timing
-errors are close to Gaussian when a transit is well sampled, but they are not
-strictly independent (shared systematics, stellar activity, detrending choices).
-That simplification is stated in docs/ASSUMPTIONS.md rather than buried here.
+An earlier version of this module used each planet's transit-EPOCH (T0) uncertainty as a
+per-transit error. That was wrong: T0 comes from a fit over many transits and is far smaller
+than a single-transit error, so the synthetic data were unrealistically precise.
+
+The noise is drawn independently and Gaussian for each transit. Real timing errors are
+close to Gaussian for well-sampled transits but are not strictly independent (shared stellar
+noise, detrending choices); that simplification is stated in the documentation.
 """
 
 from __future__ import annotations
@@ -25,43 +25,36 @@ import numpy as np
 from ..constants import SECONDS_PER_DAY
 
 
-def published_timing_uncertainties(reference: dict, planet_letters: list) -> dict:
-    """Per-planet 1-sigma transit-timing uncertainty [days], from the dataset."""
-    out = {}
-    for letter in planet_letters:
-        record = reference["planets"][letter]["transit_epoch_bjd"]
-        uncertainty = record.get("uncertainty")
-        if uncertainty is None:
-            raise ValueError(
-                f"planet {letter} has no published transit-epoch uncertainty; "
-                "a noise level cannot be invented for it"
-            )
-        out[letter] = float(uncertainty)
-    return out
-
-
 class TimingNoiseModel:
-    """Adds Gaussian timing noise with per-planet, data-derived amplitudes."""
+    """Adds Gaussian timing noise with a per-transit sigma taken from the real data."""
 
-    def __init__(self, sigma_days: dict, seed: int, scale: float = 1.0):
-        self.sigma_days = {k: v * scale for k, v in sigma_days.items()}
+    def __init__(self, pattern, seed: int, scale: float = 1.0):
+        self.sigma_days = {k: pattern[k].sigma_days * scale for k in pattern.probe_letters}
         self.seed = int(seed)
         self.scale = float(scale)
         self._rng = np.random.default_rng(seed)
+        self._source = {k: pattern[k].source for k in pattern.probe_letters}
 
-    def sigma_seconds(self, key: str) -> float:
-        return self.sigma_days[key] * SECONDS_PER_DAY
+    def sigma_seconds(self, letter: str) -> np.ndarray:
+        return self.sigma_days[letter] * SECONDS_PER_DAY
 
-    def apply(self, key: str, times: np.ndarray) -> np.ndarray:
-        """Return noisy transit times for one planet."""
-        sigma = self.sigma_days[key]
-        return np.asarray(times) + self._rng.normal(0.0, sigma, size=len(times))
+    def apply(self, letter: str, times: np.ndarray) -> np.ndarray:
+        """Return noisy transit times for one planet (one draw per transit)."""
+        sigma = self.sigma_days[letter]
+        times = np.asarray(times, dtype=np.float64)
+        if len(times) != len(sigma):
+            raise ValueError(
+                f"planet {letter}: {len(times)} transit times but {len(sigma)} published uncertainties"
+            )
+        return times + self._rng.normal(0.0, 1.0, size=len(times)) * sigma
 
     def describe(self) -> dict:
         return {
-            "model": "independent Gaussian per transit",
+            "model": "independent Gaussian per transit, per-transit sigma as published",
             "seed": self.seed,
             "scale": self.scale,
-            "sigma_seconds": {k: v * SECONDS_PER_DAY for k, v in self.sigma_days.items()},
-            "source": "published transit-epoch uncertainties from the reference dataset",
+            "median_sigma_seconds": {
+                k: float(np.median(v) * SECONDS_PER_DAY) for k, v in self.sigma_days.items()
+            },
+            "sources": self._source,
         }

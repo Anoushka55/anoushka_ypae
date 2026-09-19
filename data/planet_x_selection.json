@@ -1,0 +1,594 @@
+{
+  "criteria": {
+    "max_eccentricity": 0.25,
+    "max_energy_error": 1e-06,
+    "min_hill_separation": 8.0,
+    "detectable_factor": 2.0,
+    "target_factor": 4.0,
+    "max_single_transit_sigma": 4.0,
+    "impact_parameter_target": 1.4
+  },
+  "null_threshold": {
+    "T50": 8.37711890734044,
+    "T99": 18.67239398289312,
+    "T99.9": 23.5860941968107,
+    "n_trials": 20000,
+    "n_trial_axes": 1509
+  },
+  "required_recoverable_fraction": 0.8,
+  "n_noise_realisations": 20,
+  "screened": [
+    {
+      "parameters": {
+        "mass_earth": 100.0,
+        "semi_major_axis_au": 0.20600000000000007,
+        "eccentricity": 0.0,
+        "mean_anomaly": 2.0943951023931953,
+        "inclination_deg": 87.85365283380447,
+        "argument_of_periapsis": 0.0,
+        "longitude_of_ascending_node_deg": 0.0,
+        "radius_earth": 3.0,
+        "status": "synthetic",
+        "warning": "Planet X is not real and is not a claim about Kepler-90."
+      },
+      "period_days": 32.43922892152065,
+      "detectability_ratio": 4.044003075103168,
+      "hill_separation_min": 8.742303399357047,
+      "fraction_detected": 1.0,
+      "fraction_localised": 1.0,
+      "fraction_recoverable": 1.0
+    },
+    {
+      "parameters": {
+        "mass_earth": 100.0,
+        "semi_major_axis_au": 0.20900000000000007,
+        "eccentricity": 0.0,
+        "mean_anomaly": 0.0,
+        "inclination_deg": 87.88447575513132,
+        "argument_of_periapsis": 0.0,
+        "longitude_of_ascending_node_deg": 0.0,
+        "radius_earth": 3.0,
+        "status": "synthetic",
+        "warning": "Planet X is not real and is not a claim about Kepler-90."
+      },
+      "period_days": 33.15042656773198,
+      "detectability_ratio": 3.9176979165360715,
+      "hill_separation_min": 8.439701070088605,
+      "fraction_detected": 1.0,
+      "fraction_localised": 1.0,
+      "fraction_recoverable": 1.0
+    },
+    {
+      "parameters": {
+        "mass_earth": 10.0,
+        "semi_major_axis_au": 0.2510000000000001,
+        "eccentricity": 0.0,
+        "mean_anomaly": 0.0,
+        "inclination_deg": 88.23859064473059,
+        "argument_of_periapsis": 0.0,
+        "longitude_of_ascending_node_deg": 0.0,
+        "radius_earth": 3.0,
+        "status": "synthetic",
+        "warning": "Planet X is not real and is not a claim about Kepler-90."
+      },
+      "period_days": 43.63482542442399,
+      "detectability_ratio": 4.0029499699498095,
+      "hill_separation_min": 8.366457958915007,
+      "fraction_detected": 1.0,
+      "fraction_localised": 1.0,
+      "fraction_recoverable": 1.0
+    },
+    {
+      "parameters": {
+        "mass_earth": 100.0,
+        "semi_major_axis_au": 0.21200000000000008,
+        "eccentricity": 0.0,
+        "mean_anomaly": 4.1887902047863905,
+        "inclination_deg": 87.91442574280008,
+        "argument_of_periapsis": 0.0,
+        "longitude_of_ascending_node_deg": 0.0,
+        "radius_earth": 3.0,
+        "status": "synthetic",
+        "warning": "Planet X is not real and is not a claim about Kepler-90."
+      },
+      "period_days": 33.866746996412424,
+      "detectability_ratio": 4.193939421892097,
+      "hill_separation_min": 8.14058049056244,
+      "fraction_detected": 1.0,
+      "fraction_localised": 0.85,
+      "fraction_recoverable": 0.85
+    },
+    {
+      "parameters": {
+        "mass_earth": 10.0,
+        "semi_major_axis_au": 0.2525000000000001,
+        "eccentricity": 0.0,
+        "mean_anomaly": 0.0,
+        "inclination_deg": 88.24905773101878,
+        "argument_of_periapsis": 0.0,
+        "longitude_of_ascending_node_deg": 0.0,
+        "radius_earth": 3.0,
+        "status": "synthetic",
+        "warning": "Planet X is not real and is not a claim about Kepler-90."
+      },
+      "period_days": 44.02655806286031,
+      "detectability_ratio": 3.9026147318521964,
+      "hill_separation_min": 8.130049685670487,
+      "fraction_detected": 1.0,
+      "fraction_localised": 1.0,
+      "fraction_recoverable": 1.0
+    },
+    {
+      "parameters": {
+        "mass_earth": 50.0,
+        "semi_major_axis_au": 0.2240000000000001,
+        "eccentricity": 0.0,
+        "mean_anomaly": 2.0943951023931953,
+        "inclination_deg": 88.02619840706178,
+        "argument_of_periapsis": 0.0,
+        "longitude_of_ascending_node_deg": 0.0,
+        "radius_earth": 3.0,
+        "status": "synthetic",
+        "warning": "Planet X is not real and is not a claim about Kepler-90."
+      },
+      "period_days": 36.7850325654754,
+      "detectability_ratio": 3.6292792284413085,
+      "hill_separation_min": 8.603852003426777,
+      "fraction_detected": 1.0,
+      "fraction_localised": 1.0,
+      "fraction_recoverable": 1.0
+    },
+    {
+      "parameters": {
+        "mass_earth": 50.0,
+        "semi_major_axis_au": 0.2255000000000001,
+        "eccentricity": 0.0,
+        "mean_anomaly": 4.1887902047863905,
+        "inclination_deg": 88.03933305221871,
+        "argument_of_periapsis": 0.0,
+        "longitude_of_ascending_node_deg": 0.0,
+        "radius_earth": 3.0,
+        "status": "synthetic",
+        "warning": "Planet X is not real and is not a claim about Kepler-90."
+      },
+      "period_days": 37.155142961501376,
+      "detectability_ratio": 3.7878943702729497,
+      "hill_separation_min": 8.429146034669065,
+      "fraction_detected": 1.0,
+      "fraction_localised": 1.0,
+      "fraction_recoverable": 1.0
+    },
+    {
+      "parameters": {
+        "mass_earth": 10.0,
+        "semi_major_axis_au": 0.2510000000000001,
+        "eccentricity": 0.0,
+        "mean_anomaly": 4.1887902047863905,
+        "inclination_deg": 88.23859064473059,
+        "argument_of_periapsis": 0.0,
+        "longitude_of_ascending_node_deg": 0.0,
+        "radius_earth": 3.0,
+        "status": "synthetic",
+        "warning": "Planet X is not real and is not a claim about Kepler-90."
+      },
+      "period_days": 43.63482542442399,
+      "detectability_ratio": 3.7386653225053537,
+      "hill_separation_min": 8.366457958915007,
+      "fraction_detected": 1.0,
+      "fraction_localised": 0.0,
+      "fraction_recoverable": 0.0
+    },
+    {
+      "parameters": {
+        "mass_earth": 10.0,
+        "semi_major_axis_au": 0.2330000000000001,
+        "eccentricity": 0.0,
+        "mean_anomaly": 4.1887902047863905,
+        "inclination_deg": 88.10246811764179,
+        "argument_of_periapsis": 0.0,
+        "longitude_of_ascending_node_deg": 0.0,
+        "radius_earth": 3.0,
+        "status": "synthetic",
+        "warning": "Planet X is not real and is not a claim about Kepler-90."
+      },
+      "period_days": 39.02622482045877,
+      "detectability_ratio": 3.2275952481142363,
+      "hill_separation_min": 11.305335131224682,
+      "fraction_detected": 1.0,
+      "fraction_localised": 0.9,
+      "fraction_recoverable": 0.9
+    },
+    {
+      "parameters": {
+        "mass_earth": 100.0,
+        "semi_major_axis_au": 0.19250000000000006,
+        "eccentricity": 0.0,
+        "mean_anomaly": 2.0943951023931953,
+        "inclination_deg": 87.70305174453756,
+        "argument_of_periapsis": 0.0,
+        "longitude_of_ascending_node_deg": 0.0,
+        "radius_earth": 3.0,
+        "status": "synthetic",
+        "warning": "Planet X is not real and is not a claim about Kepler-90."
+      },
+      "period_days": 29.303250164834207,
+      "detectability_ratio": 4.781408357831348,
+      "hill_separation_min": 10.148774332350756,
+      "fraction_detected": 1.0,
+      "fraction_localised": 1.0,
+      "fraction_recoverable": 1.0
+    },
+    {
+      "parameters": {
+        "mass_earth": 10.0,
+        "semi_major_axis_au": 0.2405000000000001,
+        "eccentricity": 0.0,
+        "mean_anomaly": 2.0943951023931953,
+        "inclination_deg": 88.16166335001125,
+        "argument_of_periapsis": 0.0,
+        "longitude_of_ascending_node_deg": 0.0,
+        "radius_earth": 3.0,
+        "status": "synthetic",
+        "warning": "Planet X is not real and is not a claim about Kepler-90."
+      },
+      "period_days": 40.92562133444318,
+      "detectability_ratio": 3.230869480790465,
+      "hill_separation_min": 10.057424097149186,
+      "fraction_detected": 1.0,
+      "fraction_localised": 1.0,
+      "fraction_recoverable": 1.0
+    },
+    {
+      "parameters": {
+        "mass_earth": 50.0,
+        "semi_major_axis_au": 0.2240000000000001,
+        "eccentricity": 0.0,
+        "mean_anomaly": 4.1887902047863905,
+        "inclination_deg": 88.02619840706178,
+        "argument_of_periapsis": 0.0,
+        "longitude_of_ascending_node_deg": 0.0,
+        "radius_earth": 3.0,
+        "status": "synthetic",
+        "warning": "Planet X is not real and is not a claim about Kepler-90."
+      },
+      "period_days": 36.7850325654754,
+      "detectability_ratio": 3.2830895231588744,
+      "hill_separation_min": 8.603852003426777,
+      "fraction_detected": 1.0,
+      "fraction_localised": 0.8,
+      "fraction_recoverable": 0.8
+    },
+    {
+      "parameters": {
+        "mass_earth": 50.0,
+        "semi_major_axis_au": 0.19700000000000006,
+        "eccentricity": 0.0,
+        "mean_anomaly": 2.0943951023931953,
+        "inclination_deg": 87.7555472747394,
+        "argument_of_periapsis": 0.0,
+        "longitude_of_ascending_node_deg": 0.0,
+        "radius_earth": 3.0,
+        "status": "synthetic",
+        "warning": "Planet X is not real and is not a claim about Kepler-90."
+      },
+      "period_days": 30.338804023203707,
+      "detectability_ratio": 2.821583419249468,
+      "hill_separation_min": 11.925519333455817,
+      "fraction_detected": 1.0,
+      "fraction_localised": 0.9,
+      "fraction_recoverable": 0.9
+    },
+    {
+      "parameters": {
+        "mass_earth": 50.0,
+        "semi_major_axis_au": 0.19850000000000007,
+        "eccentricity": 0.0,
+        "mean_anomaly": 2.0943951023931953,
+        "inclination_deg": 87.77251645728984,
+        "argument_of_periapsis": 0.0,
+        "longitude_of_ascending_node_deg": 0.0,
+        "radius_earth": 3.0,
+        "status": "synthetic",
+        "warning": "Planet X is not real and is not a claim about Kepler-90."
+      },
+      "period_days": 30.68597197023528,
+      "detectability_ratio": 3.0099527085839526,
+      "hill_separation_min": 11.731718458947322,
+      "fraction_detected": 1.0,
+      "fraction_localised": 0.95,
+      "fraction_recoverable": 0.95
+    },
+    {
+      "parameters": {
+        "mass_earth": 50.0,
+        "semi_major_axis_au": 0.20000000000000007,
+        "eccentricity": 0.0,
+        "mean_anomaly": 0.0,
+        "inclination_deg": 87.78923091098987,
+        "argument_of_periapsis": 0.0,
+        "longitude_of_ascending_node_deg": 0.0,
+        "radius_earth": 3.0,
+        "status": "synthetic",
+        "warning": "Planet X is not real and is not a claim about Kepler-90."
+      },
+      "period_days": 31.034454125529393,
+      "detectability_ratio": 2.969958500697396,
+      "hill_separation_min": 11.539058784573747,
+      "fraction_detected": 1.0,
+      "fraction_localised": 1.0,
+      "fraction_recoverable": 1.0
+    },
+    {
+      "parameters": {
+        "mass_earth": 50.0,
+        "semi_major_axis_au": 0.20000000000000007,
+        "eccentricity": 0.0,
+        "mean_anomaly": 4.1887902047863905,
+        "inclination_deg": 87.78923091098987,
+        "argument_of_periapsis": 0.0,
+        "longitude_of_ascending_node_deg": 0.0,
+        "radius_earth": 3.0,
+        "status": "synthetic",
+        "warning": "Planet X is not real and is not a claim about Kepler-90."
+      },
+      "period_days": 31.034454125529393,
+      "detectability_ratio": 5.19057126138449,
+      "hill_separation_min": 11.539058784573747,
+      "fraction_detected": 1.0,
+      "fraction_localised": 1.0,
+      "fraction_recoverable": 1.0
+    },
+    {
+      "parameters": {
+        "mass_earth": 10.0,
+        "semi_major_axis_au": 0.2330000000000001,
+        "eccentricity": 0.0,
+        "mean_anomaly": 2.0943951023931953,
+        "inclination_deg": 88.10246811764179,
+        "argument_of_periapsis": 0.0,
+        "longitude_of_ascending_node_deg": 0.0,
+        "radius_earth": 3.0,
+        "status": "synthetic",
+        "warning": "Planet X is not real and is not a claim about Kepler-90."
+      },
+      "period_days": 39.02622482045877,
+      "detectability_ratio": 2.98432517029747,
+      "hill_separation_min": 11.305335131224682,
+      "fraction_detected": 1.0,
+      "fraction_localised": 0.7,
+      "fraction_recoverable": 0.7
+    },
+    {
+      "parameters": {
+        "mass_earth": 100.0,
+        "semi_major_axis_au": 0.18950000000000006,
+        "eccentricity": 0.0,
+        "mean_anomaly": 2.0943951023931953,
+        "inclination_deg": 87.66666848883028,
+        "argument_of_periapsis": 0.0,
+        "longitude_of_ascending_node_deg": 0.0,
+        "radius_earth": 3.0,
+        "status": "synthetic",
+        "warning": "Planet X is not real and is not a claim about Kepler-90."
+      },
+      "period_days": 28.620914969184536,
+      "detectability_ratio": 3.046933467500833,
+      "hill_separation_min": 9.88992708690979,
+      "fraction_detected": 1.0,
+      "fraction_localised": 1.0,
+      "fraction_recoverable": 1.0
+    },
+    {
+      "parameters": {
+        "mass_earth": 25.0,
+        "semi_major_axis_au": 0.2300000000000001,
+        "eccentricity": 0.0,
+        "mean_anomaly": 0.0,
+        "inclination_deg": 88.07770847093695,
+        "argument_of_periapsis": 0.0,
+        "longitude_of_ascending_node_deg": 0.0,
+        "radius_earth": 3.0,
+        "status": "synthetic",
+        "warning": "Planet X is not real and is not a claim about Kepler-90."
+      },
+      "period_days": 38.27415273182703,
+      "detectability_ratio": 2.980937697844924,
+      "hill_separation_min": 9.582500260005785,
+      "fraction_detected": 1.0,
+      "fraction_localised": 1.0,
+      "fraction_recoverable": 1.0
+    },
+    {
+      "parameters": {
+        "mass_earth": 50.0,
+        "semi_major_axis_au": 0.20150000000000007,
+        "eccentricity": 0.0,
+        "mean_anomaly": 0.0,
+        "inclination_deg": 87.8056963302066,
+        "argument_of_periapsis": 0.0,
+        "longitude_of_ascending_node_deg": 0.0,
+        "radius_earth": 3.0,
+        "status": "synthetic",
+        "warning": "Planet X is not real and is not a claim about Kepler-90."
+      },
+      "period_days": 31.38424555145989,
+      "detectability_ratio": 2.7050762461679656,
+      "hill_separation_min": 11.347530259957965,
+      "fraction_detected": 1.0,
+      "fraction_localised": 1.0,
+      "fraction_recoverable": 1.0
+    },
+    {
+      "parameters": {
+        "mass_earth": 50.0,
+        "semi_major_axis_au": 0.20150000000000007,
+        "eccentricity": 0.0,
+        "mean_anomaly": 4.1887902047863905,
+        "inclination_deg": 87.8056963302066,
+        "argument_of_periapsis": 0.0,
+        "longitude_of_ascending_node_deg": 0.0,
+        "radius_earth": 3.0,
+        "status": "synthetic",
+        "warning": "Planet X is not real and is not a claim about Kepler-90."
+      },
+      "period_days": 31.38424555145989,
+      "detectability_ratio": 2.809177208164466,
+      "hill_separation_min": 11.347530259957965,
+      "fraction_detected": 1.0,
+      "fraction_localised": 1.0,
+      "fraction_recoverable": 1.0
+    },
+    {
+      "parameters": {
+        "mass_earth": 10.0,
+        "semi_major_axis_au": 0.2330000000000001,
+        "eccentricity": 0.0,
+        "mean_anomaly": 0.0,
+        "inclination_deg": 88.10246811764179,
+        "argument_of_periapsis": 0.0,
+        "longitude_of_ascending_node_deg": 0.0,
+        "radius_earth": 3.0,
+        "status": "synthetic",
+        "warning": "Planet X is not real and is not a claim about Kepler-90."
+      },
+      "period_days": 39.02622482045877,
+      "detectability_ratio": 2.6518497890188577,
+      "hill_separation_min": 11.305335131224682,
+      "fraction_detected": 1.0,
+      "fraction_localised": 1.0,
+      "fraction_recoverable": 1.0
+    },
+    {
+      "parameters": {
+        "mass_earth": 10.0,
+        "semi_major_axis_au": 0.2420000000000001,
+        "eccentricity": 0.0,
+        "mean_anomaly": 0.0,
+        "inclination_deg": 88.17306187403278,
+        "argument_of_periapsis": 0.0,
+        "longitude_of_ascending_node_deg": 0.0,
+        "radius_earth": 3.0,
+        "status": "synthetic",
+        "warning": "Planet X is not real and is not a claim about Kepler-90."
+      },
+      "period_days": 41.3090977548648,
+      "detectability_ratio": 2.7854002013542316,
+      "hill_separation_min": 9.811915106125904,
+      "fraction_detected": 1.0,
+      "fraction_localised": 1.0,
+      "fraction_recoverable": 1.0
+    },
+    {
+      "parameters": {
+        "mass_earth": 10.0,
+        "semi_major_axis_au": 0.2420000000000001,
+        "eccentricity": 0.0,
+        "mean_anomaly": 2.0943951023931953,
+        "inclination_deg": 88.17306187403278,
+        "argument_of_periapsis": 0.0,
+        "longitude_of_ascending_node_deg": 0.0,
+        "radius_earth": 3.0,
+        "status": "synthetic",
+        "warning": "Planet X is not real and is not a claim about Kepler-90."
+      },
+      "period_days": 41.3090977548648,
+      "detectability_ratio": 2.734011020534685,
+      "hill_separation_min": 9.811915106125904,
+      "fraction_detected": 1.0,
+      "fraction_localised": 0.95,
+      "fraction_recoverable": 0.95
+    },
+    {
+      "parameters": {
+        "mass_earth": 25.0,
+        "semi_major_axis_au": 0.2300000000000001,
+        "eccentricity": 0.0,
+        "mean_anomaly": 4.1887902047863905,
+        "inclination_deg": 88.07770847093695,
+        "argument_of_periapsis": 0.0,
+        "longitude_of_ascending_node_deg": 0.0,
+        "radius_earth": 3.0,
+        "status": "synthetic",
+        "warning": "Planet X is not real and is not a claim about Kepler-90."
+      },
+      "period_days": 38.27415273182703,
+      "detectability_ratio": 2.7666072503913526,
+      "hill_separation_min": 9.582500260005785,
+      "fraction_detected": 1.0,
+      "fraction_localised": 0.7,
+      "fraction_recoverable": 0.7
+    }
+  ],
+  "selected": {
+    "parameters": {
+      "mass_earth": 100.0,
+      "semi_major_axis_au": 0.20600000000000007,
+      "eccentricity": 0.0,
+      "mean_anomaly": 2.0943951023931953,
+      "inclination_deg": 87.85365283380447,
+      "argument_of_periapsis": 0.0,
+      "longitude_of_ascending_node_deg": 0.0,
+      "radius_earth": 3.0,
+      "status": "synthetic",
+      "warning": "Planet X is not real and is not a claim about Kepler-90."
+    },
+    "stability": {
+      "bound": true,
+      "orbit_crossing": false,
+      "max_eccentricity": 0.01735482888964082,
+      "max_relative_axis_change": 0.006382339562771179,
+      "max_energy_error": 5.330742313141859e-09,
+      "min_pairwise_separation_au": 0.011443069863121122
+    },
+    "hill_separation_min": 8.742303399357047,
+    "impact_parameter": 1.400000000000002,
+    "period_days": 32.43922892152065,
+    "orbital_residuals": {
+      "max_dr_au": [
+        0.003969685223902936,
+        0.008047446288358172,
+        0.016711460638860406,
+        0.03575311274042529,
+        0.07649826398954973,
+        0.07683766539156815,
+        0.047944181404718546,
+        0.05246847139466554
+      ],
+      "max_dv_au_per_day": [
+        0.0035076098531178256,
+        0.0058002093445663145,
+        0.007265157343327148,
+        0.003692695001037231,
+        0.005218248998876964,
+        0.003849462561714203,
+        0.0014044040533521247,
+        0.001003167827092745
+      ]
+    },
+    "signal": {
+      "delta_chi2_expected": 75.51121868635767,
+      "per_planet_delta_chi2": {
+        "d": 73.45014950124343,
+        "e": 2.061069185114262
+      },
+      "ttv_amplitude_minutes": {
+        "d": 72.5297299878513,
+        "e": 21.07140096878115
+      },
+      "max_single_transit_sigma": 3.5152606763599366,
+      "delta_chi2_vs_baseline": {
+        "400.0": 18.395728765217356,
+        "700.0": 40.258603878190684,
+        "1000.0": 61.11965002740894,
+        "1459.5": 75.51121868635767
+      }
+    },
+    "tension_with_real_data": {
+      "d": 62.305991792499945,
+      "e": 6.659643976780643
+    },
+    "detectability_ratio": 4.044003075103168,
+    "objective_distance": 0.010940700449313338
+  },
+  "warning": "Planet X is synthetic. Not a claim about Kepler-90."
+}

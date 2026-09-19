@@ -29,7 +29,14 @@ def reference() -> dict:
 
 @pytest.fixture(scope="module")
 def system(reference):
+    """The production system: initial conditions matched to the real transit times."""
     return build_kepler90(reference=reference)
+
+
+@pytest.fixture(scope="module")
+def catalogue_system(reference):
+    """The raw catalogue conversion: catalogue period used as the osculating period."""
+    return build_kepler90(reference=reference, initial_conditions="catalogue")
 
 
 # =============================================================================
@@ -49,14 +56,14 @@ def test_system_contains_only_real_bodies(system):
         assert f"Kepler-90 {letter}" in system.names
 
 
-def test_osculating_periods_match_the_catalogue(system, reference):
+def test_osculating_periods_match_the_catalogue(catalogue_system, reference):
     """Each planet's initial osculating period must match its catalogue period.
 
     Tolerance 1e-4 relative. The residual is dominated by a known systematic:
-    the catalogue's semi-major axes were derived with a slightly different value
-    of GM_sun than the IAU nominal value adopted here, a 1.26e-5 relative offset
-    documented in docs/KEPLER90_DATA.md.
+    the catalogue's semi-major axes were derived with the 4 pi^2 au^3/yr^2
+    shortcut, a 1.26e-5 relative offset in a documented in docs/UNITS.md.
     """
+    system = catalogue_system
     elements = osculating_elements(system.masses, system.positions, system.velocities)
     for letter, el in zip(PLANET_ORDER, elements):
         catalogue = reference["planets"][letter]["orbital_period_days"]["value"]
@@ -67,13 +74,14 @@ def test_osculating_periods_match_the_catalogue(system, reference):
         )
 
 
-def test_osculating_axes_follow_keplers_law_with_total_mass(system, reference):
+def test_osculating_axes_follow_keplers_law_with_total_mass(catalogue_system, reference):
     """Semi-major axis must satisfy Kepler's third law using the TOTAL mass.
 
     We derive a from the measured period rather than reading the catalogue's a,
     because the catalogue computed a from the STELLAR MASS ALONE. Tolerance
     1e-9 relative against the correct two-body relation.
     """
+    system = catalogue_system
     elements = osculating_elements(system.masses, system.positions, system.velocities)
     m_star = reference["star"]["mass_solar"]["value"]
     for idx, (letter, el) in enumerate(zip(PLANET_ORDER, elements), start=1):
@@ -83,7 +91,7 @@ def test_osculating_axes_follow_keplers_law_with_total_mass(system, reference):
         assert relative < 1e-9, f"planet {letter}: a mismatch, relative {relative:.2e}"
 
 
-def test_axis_deviation_from_catalogue_is_the_neglected_planet_mass(system, reference):
+def test_axis_deviation_from_catalogue_is_the_neglected_planet_mass(catalogue_system, reference):
     """The deviation from the catalogue's a must be explained, not merely tolerated.
 
     The catalogue used a^3 = G M_star P^2 / 4pi^2, omitting the planet mass. The
@@ -94,9 +102,10 @@ def test_axis_deviation_from_catalogue_is_the_neglected_planet_mass(system, refe
     factor, which turns an unexplained mismatch into a quantitative confirmation
     that both we and the catalogue are doing what we claim. For Kepler-90 h the
     effect is 1.7e-4 in a (2.2 hours per orbit in P); for the small planets it is
-    ~1e-6 and the residual is dominated by the catalogue's slightly different
-    value of GM_sun (a uniform 1.26e-5, see docs/KEPLER90_DATA.md).
+    ~1e-6 and the residual is the uniform 1.26e-5 offset caused by the catalogue
+    using the 4 pi^2 au^3/yr^2 shortcut (see docs/UNITS.md).
     """
+    system = catalogue_system
     m_star = reference["star"]["mass_solar"]["value"]
     for idx, letter in enumerate(PLANET_ORDER, start=1):
         catalogue = reference["planets"][letter]["semi_major_axis_au"]["value"]
@@ -127,7 +136,9 @@ def test_planet_is_transiting_at_its_published_transit_epoch(letter, reference):
     would otherwise silently corrupt every transit time in the project.
     """
     transit_epoch = reference["planets"][letter]["transit_epoch_bjd"]["value"]
-    system = build_kepler90(epoch_bjd=transit_epoch, planets=[letter], reference=reference)
+    system = build_kepler90(
+        epoch_bjd=transit_epoch, planets=[letter], reference=reference, initial_conditions="catalogue"
+    )
 
     star_pos = system.positions[0]
     planet_pos = system.positions[1]
@@ -305,3 +316,101 @@ def test_no_close_approach_in_baseline(baseline_run):
     """
     closest = float(np.min(baseline_run["min_separation"]))
     assert closest > 0.005, f"closest approach {closest:.5f} au"
+
+
+# =============================================================================
+# The matched initial conditions
+# =============================================================================
+
+def test_matched_axes_follow_keplers_law_with_the_matched_period(system, reference):
+    """In the production system a is derived from the MATCHED osculating period and the
+    total mass; tolerance 1e-9 relative."""
+    import json
+
+    from invisible_planet.systems.kepler90 import MATCHED_PATH
+
+    matched = json.loads(MATCHED_PATH.read_text(encoding="utf-8"))
+    m_star = reference["star"]["mass_solar"]["value"]
+    elements = osculating_elements(system.masses, system.positions, system.velocities)
+    for idx, (letter, el) in enumerate(zip(PLANET_ORDER, elements), start=1):
+        period = matched["planets"][letter]["osculating_period_days"]
+        expected = C.kepler_third_law_axis(period, m_star + system.masses[idx])
+        assert abs(el["semi_major_axis"] - expected) / expected < 1e-9, letter
+
+
+def test_osculating_and_mean_periods_differ_as_documented(reference):
+    """The reason the matching exists: in a near-resonant system the fitted MEAN transit
+    period differs from the OSCULATING period. Planet g's difference must be the largest
+    (~0.4%) and planets b, c, i must differ by less than 3e-4."""
+    import json
+
+    from invisible_planet.systems.kepler90 import MATCHED_PATH
+
+    matched = json.loads(MATCHED_PATH.read_text(encoding="utf-8"))["planets"]
+    offset = {
+        k: abs(matched[k]["osculating_period_days"] / matched[k]["fitted_mean_transit_period_days"] - 1.0)
+        for k in PLANET_ORDER
+    }
+    assert max(offset, key=offset.get) == "g"
+    assert 1e-3 < offset["g"] < 1e-2
+    for k in ("b", "c", "i"):
+        assert offset[k] < 3e-4
+
+
+@pytest.fixture(scope="module")
+def matched_run(system, reference):
+    """Transit times of the production system at the production timestep."""
+    from invisible_planet.constants import SECONDS_PER_DAY  # noqa: F401
+    from invisible_planet.observations.transits import observe_transits
+    from invisible_planet.systems.kepler90 import DEFAULT_DURATION_DAYS
+
+    return observe_transits(system, DEFAULT_DURATION_DAYS, recommended_timestep(reference))
+
+
+def test_matched_system_reproduces_the_real_transit_times_of_d(matched_run, system):
+    """Planet d has no significant real TTV, so a correct model must reproduce its 16 real
+    transit times at the level of the measurement noise: chi2 per point below 2.5 with
+    its published per-transit uncertainties."""
+    from invisible_planet.observations.pattern import load_pattern, select_at_epochs
+
+    observed = load_pattern()["d"]
+    sim, present = select_at_epochs(system.epoch + matched_run.for_planet("Kepler-90 d"), observed)
+    assert present.all()
+    chi2 = float(np.sum(((observed.measured_bjd - sim) / observed.sigma_days) ** 2))
+    assert chi2 / observed.n_transits < 2.5, f"chi2 = {chi2:.1f} for {observed.n_transits} transits"
+
+
+def test_matched_system_reproduces_the_catalogue_ephemerides_of_the_other_planets(matched_run, reference, system):
+    """b, c, i, f have no published transit times; their simulated mean periods must match
+    the catalogue to 5e-5 at the production timestep (the O(dt^2) frequency error of
+    planet b at 1000 steps/orbit is 1.4e-5, measured against IAS15)."""
+    from invisible_planet.observations.ttv import fit_linear_ephemeris
+
+    for letter in ("b", "c", "i", "f"):
+        catalogue = reference["planets"][letter]["orbital_period_days"]["value"]
+        t = system.epoch + matched_run.for_planet(f"Kepler-90 {letter}")
+        epochs = np.round((t - t[0]) / catalogue).astype(int)
+        fitted = fit_linear_ephemeris(t, epochs=epochs).period
+        assert abs(fitted - catalogue) / catalogue < 5e-5, letter
+
+
+def test_matched_system_is_stable_over_the_kepler_window(system, reference):
+    """The matched system must remain a bound, non-crossing, energy-conserving system over
+    the full 1459.5 d window."""
+    from invisible_planet.systems.kepler90 import DEFAULT_DURATION_DAYS
+
+    dt = recommended_timestep(reference)
+    engine = NBodyEngine(n_bodies=system.n_bodies)
+    engine.set_state(system.masses, system.positions, system.velocities)
+    e0 = float(engine.total_energy()[0])
+    axes, eccs = [], []
+    for _ in range(40):
+        engine.run(dt, int(DEFAULT_DURATION_DAYS / dt) // 40)
+        el = osculating_elements(system.masses, engine.get_positions()[0], engine.get_velocities()[0])
+        axes.append([e["semi_major_axis"] for e in el])
+        eccs.append([e["eccentricity"] for e in el])
+    axes, eccs = np.array(axes), np.array(eccs)
+    for i in range(len(PLANET_ORDER) - 1):
+        assert np.min(axes[:, i + 1] * (1 - eccs[:, i + 1])) > np.max(axes[:, i] * (1 + eccs[:, i]))
+    assert np.max(eccs) < 0.1
+    assert abs(float(engine.total_energy()[0]) - e0) / abs(e0) < 1e-6

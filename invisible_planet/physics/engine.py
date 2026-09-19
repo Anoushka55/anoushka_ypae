@@ -69,8 +69,8 @@ class NBodyEngine:
         self.pos = ti.Vector.field(3, ti.f64, shape=shape)
         self.vel = ti.Vector.field(3, ti.f64, shape=shape)
         self.acc = ti.Vector.field(3, ti.f64, shape=shape)
+        self.partial_acc = ti.Vector.field(3, ti.f64, shape=shape)
         self.mass = ti.field(ti.f64, shape=shape)
-        self.active = ti.field(ti.i32, shape=shape)  # 0 lets an ensemble member use fewer bodies
 
         # scalar diagnostics, one per ensemble member
         self._ke = ti.field(ti.f64, shape=self.k)
@@ -111,7 +111,6 @@ class NBodyEngine:
         masses: np.ndarray,
         positions: np.ndarray,
         velocities: np.ndarray,
-        active: Optional[np.ndarray] = None,
         time: float = 0.0,
     ) -> None:
         """Load initial conditions. Accepts (N,) / (N,3) and broadcasts across the
@@ -132,17 +131,9 @@ class NBodyEngine:
         if p.shape != (self.k, self.n, 3) or v.shape != (self.k, self.n, 3):
             raise ValueError("position/velocity shape mismatch")
 
-        if active is None:
-            a = np.ones((self.k, self.n), dtype=np.int32)
-        else:
-            a = np.asarray(active, dtype=np.int32)
-            if a.ndim == 1:
-                a = np.broadcast_to(a, (self.k, self.n)).copy()
-
         self.mass.from_numpy(m)
         self.pos.from_numpy(p)
         self.vel.from_numpy(v)
-        self.active.from_numpy(a)
         self.time = float(time)
         self._compute_accelerations()  # velocity Verlet needs a valid a(t) on entry
 
@@ -245,18 +236,56 @@ class NBodyEngine:
     # ------------------------------------------------------------------
     # gravity
     # ------------------------------------------------------------------
+    @ti.func
+    def _evaluate_accelerations(self, k):
+        """Newtonian accelerations of every body of ensemble member k.
+
+            a_i = G * sum_{j != i} m_j (r_j - r_i) / |r_j - r_i|^3
+
+        PERFORMANCE NOTE (measured in scripts/profile_engine.py, docs/PERFORMANCE.md): this
+        plain double loop is the fastest of the variants tried. Evaluating each pair once and
+        accumulating into the global acceleration field was 2.6x SLOWER (Taichi compiles the
+        += on a global field to an atomic add); unrolling the loops with ti.static was 1.2x
+        slower; a symmetric-pair loop with a local accumulator matrix was within 7% of this
+        one and not worth the added complexity. The cost is dominated by the square root and
+        division in each of the ~90 pair evaluations per step.
+        """
+        for i in range(self.n):
+            a = ti.Vector([0.0, 0.0, 0.0], dt=ti.f64)
+            for j in range(self.n):
+                if j != i:
+                    d = self.pos[k, j] - self.pos[k, i]
+                    r2 = d.dot(d)
+                    inv_r3 = 1.0 / (r2 * ti.sqrt(r2))
+                    a += d * (G * self.mass[k, j] * inv_r3)
+            self.acc[k, i] = a
+
     @ti.kernel
-    def _compute_accelerations(self):
+    def _partial_accelerations(self, source: ti.i32):
+        """Acceleration of every body due to body `source` ALONE (the single term j = source
+        of the force sum), stored in `partial_acc`."""
         for k, i in ti.ndrange(self.k, self.n):
             a = ti.Vector([0.0, 0.0, 0.0], dt=ti.f64)
-            if self.active[k, i] == 1:
-                for j in range(self.n):
-                    if j != i and self.active[k, j] == 1:
-                        d = self.pos[k, j] - self.pos[k, i]
-                        r2 = d.dot(d)
-                        inv_r3 = 1.0 / (r2 * ti.sqrt(r2))
-                        a += d * (G * self.mass[k, j] * inv_r3)
-            self.acc[k, i] = a
+            if i != source:
+                d = self.pos[k, source] - self.pos[k, i]
+                r2 = d.dot(d)
+                a = d * (G * self.mass[k, source] / (r2 * ti.sqrt(r2)))
+            self.partial_acc[k, i] = a
+
+    def acceleration_due_to(self, source: int) -> np.ndarray:
+        """(K, N, 3) acceleration of each body caused by body `source` alone.
+
+        This is one term of the same Newtonian sum that drives the integration, so it is exactly
+        the part of each body's acceleration attributable to that source - what the 'perturbation
+        vector' display shows for the hidden planet. It adds no force; it only reads one.
+        """
+        self._partial_accelerations(int(source))
+        return self.partial_acc.to_numpy()
+
+    @ti.kernel
+    def _compute_accelerations(self):
+        for k in range(self.k):
+            self._evaluate_accelerations(k)
 
     @ti.kernel
     def _integrate(self, dt: ti.f64, n_steps: ti.i32, start_time: ti.f64):
@@ -274,30 +303,18 @@ class NBodyEngine:
             for _step in range(n_steps):
                 # --- kick: v(t) -> v(t + dt/2), using the cached a(t) ---
                 for i in range(self.n):
-                    if self.active[k, i] == 1:
-                        self.vel[k, i] += self.acc[k, i] * half
+                    self.vel[k, i] += self.acc[k, i] * half
 
                 # --- drift: r(t) -> r(t + dt) ---
                 for i in range(self.n):
-                    if self.active[k, i] == 1:
-                        self.pos[k, i] += self.vel[k, i] * dt
+                    self.pos[k, i] += self.vel[k, i] * dt
 
                 # --- single force evaluation at the new positions ---
-                for i in range(self.n):
-                    a = ti.Vector([0.0, 0.0, 0.0], dt=ti.f64)
-                    if self.active[k, i] == 1:
-                        for j in range(self.n):
-                            if j != i and self.active[k, j] == 1:
-                                d = self.pos[k, j] - self.pos[k, i]
-                                r2 = d.dot(d)
-                                inv_r3 = 1.0 / (r2 * ti.sqrt(r2))
-                                a += d * (G * self.mass[k, j] * inv_r3)
-                    self.acc[k, i] = a
+                self._evaluate_accelerations(k)
 
                 # --- kick: v(t + dt/2) -> v(t + dt) ---
                 for i in range(self.n):
-                    if self.active[k, i] == 1:
-                        self.vel[k, i] += self.acc[k, i] * half
+                    self.vel[k, i] += self.acc[k, i] * half
 
                 # --- transit detection at the completed step ---
                 if ti.static(self.transit_detection_enabled):
@@ -404,31 +421,27 @@ class NBodyEngine:
             self._com_vel[k] = ti.Vector([0.0, 0.0, 0.0], dt=ti.f64)
 
         for k, i in ti.ndrange(self.k, self.n):
-            if self.active[k, i] == 1:
-                m = self.mass[k, i]
-                v = self.vel[k, i]
-                r = self.pos[k, i]
-                self._ke[k] += 0.5 * m * v.dot(v)
-                self._mom[k] += m * v
-                self._angmom[k] += m * r.cross(v)
-                self._com[k] += m * r
-                self._com_vel[k] += m * v
+            m = self.mass[k, i]
+            v = self.vel[k, i]
+            r = self.pos[k, i]
+            self._ke[k] += 0.5 * m * v.dot(v)
+            self._mom[k] += m * v
+            self._angmom[k] += m * r.cross(v)
+            self._com[k] += m * r
+            self._com_vel[k] += m * v
 
         # potential energy: strictly j > i so no pair is counted twice
         for k, i in ti.ndrange(self.k, self.n):
-            if self.active[k, i] == 1:
-                for j in range(i + 1, self.n):
-                    if self.active[k, j] == 1:
-                        d = self.pos[k, j] - self.pos[k, i]
-                        r = ti.sqrt(d.dot(d))
-                        self._pe[k] -= G * self.mass[k, i] * self.mass[k, j] / r
-                        ti.atomic_min(self._min_sep[k], r)
+            for j in range(i + 1, self.n):
+                d = self.pos[k, j] - self.pos[k, i]
+                r = ti.sqrt(d.dot(d))
+                self._pe[k] -= G * self.mass[k, i] * self.mass[k, j] / r
+                ti.atomic_min(self._min_sep[k], r)
 
         for k in range(self.k):
             total_mass = 0.0
             for i in range(self.n):
-                if self.active[k, i] == 1:
-                    total_mass += self.mass[k, i]
+                total_mass += self.mass[k, i]
             self._com[k] /= total_mass
             self._com_vel[k] /= total_mass
 

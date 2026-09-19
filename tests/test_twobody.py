@@ -59,15 +59,41 @@ def test_gravitational_constant_matches_gaussian_constant():
     assert abs(C.G - C.GAUSS_K**2) / C.G < 1e-9
 
 
-def test_four_pi_squared_shortcut_is_rejected():
-    """Document, as an executable assertion, why G is not taken to be 4*pi^2 au^3/yr^2.
+def test_four_pi_squared_shortcut_is_an_approximation_with_a_known_origin():
+    """G M_sun = 4 pi^2 au^3/yr^2 is inexact, and the discrepancy has a known cause.
 
-    The shortcut is wrong by ~3.8e-5 relative, which is far larger than the
-    tolerance of any timing test in this project.
+    It corresponds to a period of exactly 365.25 d at 1 au, whereas the Gaussian
+    constant implies 2*pi/k = 365.2569 d. The relative error in GM is therefore
+    (2*pi/k / 365.25)^2 - 1 = 3.777e-5; this test verifies that to 1e-3 of itself.
+    Used consistently the shortcut would not alter any transit time; the project
+    avoids it because published semi-major axes embed it (see docs/UNITS.md).
     """
     shortcut = 4.0 * math.pi**2 / C.DAYS_PER_YEAR_JULIAN**2
     relative_error = abs(shortcut - C.G) / C.G
-    assert relative_error > 1e-5, "shortcut unexpectedly accurate; revisit the analysis"
+    explained = (2.0 * math.pi / C.GAUSS_K / C.DAYS_PER_YEAR_JULIAN) ** 2 - 1.0
+    assert abs(relative_error - explained) / explained < 1e-3
+
+
+def test_catalogue_semi_major_axes_embed_the_shortcut():
+    """The Weiss et al. (2024) axes must equal (M_star P_yr^2)^(1/3) to 1e-8.
+
+    This is the evidence that the catalogue used the 4 pi^2 shortcut with the stellar
+    mass alone, which is why the project derives `a` from the period instead.
+    """
+    import json
+    from pathlib import Path
+
+    ref = json.loads(
+        (Path(__file__).resolve().parents[1] / "data" / "kepler90_reference.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    m_star = ref["star"]["mass_solar"]["value"]
+    for letter, planet in ref["planets"].items():
+        period = planet["orbital_period_days"]["value"]
+        catalogue = planet["semi_major_axis_au"]["value"]
+        shortcut_axis = (m_star * (period / C.DAYS_PER_YEAR_JULIAN) ** 2) ** (1.0 / 3.0)
+        assert abs(shortcut_axis - catalogue) / catalogue < 1e-8, letter
 
 
 # =============================================================================

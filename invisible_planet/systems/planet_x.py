@@ -27,8 +27,9 @@ PARAMETERISATION
     a_X     semi-major axis       [au]
     e_X     eccentricity
     M_X     mean anomaly at epoch [rad]   (orbital phase)
-    i_X     inclination           [rad]   (default: coplanar with the system)
+    i_X     inclination           [deg]   (default: nearly coplanar with the system)
     w_X     argument of periapsis [rad]
+    Omega_X longitude of the ascending node [deg] (0 = aligned with the visible planets)
 
 Phase and periapsis are separate parameters even though they are degenerate at
 e = 0; the inference stage must be able to hold e fixed at zero and still search
@@ -64,6 +65,7 @@ class PlanetXParameters:
     mean_anomaly: float = 0.0
     inclination_deg: float = 89.8
     argument_of_periapsis: float = 0.0
+    longitude_of_ascending_node_deg: float = 0.0
     radius_earth: float = 3.0  # affects transit geometry only, never gravity
 
     @property
@@ -83,10 +85,17 @@ class PlanetXParameters:
             "mean_anomaly": self.mean_anomaly,
             "inclination_deg": self.inclination_deg,
             "argument_of_periapsis": self.argument_of_periapsis,
+            "longitude_of_ascending_node_deg": self.longitude_of_ascending_node_deg,
             "radius_earth": self.radius_earth,
             "status": "synthetic",
             "warning": "Planet X is not real and is not a claim about Kepler-90.",
         }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "PlanetXParameters":
+        names = {"mass_earth", "semi_major_axis_au", "eccentricity", "mean_anomaly", "inclination_deg",
+                 "argument_of_periapsis", "longitude_of_ascending_node_deg", "radius_earth"}
+        return cls(**{k: float(v) for k, v in data.items() if k in names})
 
     @classmethod
     def from_period(cls, mass_earth: float, period_days: float,
@@ -131,7 +140,7 @@ def build_system_with_planet_x(
         parameters.semi_major_axis_au,
         parameters.eccentricity,
         np.deg2rad(parameters.inclination_deg),
-        0.0,
+        np.deg2rad(parameters.longitude_of_ascending_node_deg),
         parameters.argument_of_periapsis,
         parameters.mean_anomaly,
     )

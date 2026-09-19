@@ -124,8 +124,9 @@ ADOPTION = {
     "semi_major_axis_au": (
         "WEISS_ET_AL__2024",
         "derived",
-        "Published by Weiss et al.; verified here to follow Kepler's third law with "
-        "their own stellar mass, so it is a derived quantity, not an independent measurement.",
+        "Published by Weiss et al. It equals (M* P_yr^2)^(1/3) to 1e-9 (CHECK 1b): the 4 pi^2 "
+        "shortcut with the stellar mass alone. A derived quantity, not a measurement, and NOT "
+        "used by the simulation, which derives a from the period and the total mass.",
     ),
     "planet_radius_earth": (
         "WEISS_ET_AL__2024",
@@ -171,18 +172,19 @@ def weiss_marcy_2014_mass(radius_earth: float) -> tuple[float, float, str]:
 
     Returns (mass_earth, uncertainty_earth, branch_name).
 
-    The quoted RMS scatter of masses about the power-law fit is 4.3 M_earth with
-    reduced chi^2 = 6.2, i.e. the relation has LARGE intrinsic dispersion. That
-    scatter is carried through as the uncertainty so no downstream code can mistake
-    these for measured masses.
+    For 1.5-4 R_earth the paper quotes an RMS of masses about the fit of 4.3 M_earth
+    (reduced chi^2 = 6.2), which is used as the uncertainty. For R < 1.5 R_earth the
+    paper quotes no scatter, so the uncertainty is an explicit ASSUMPTION of this
+    project (50% of the mass, floor 0.5 M_earth). Either way the values are model-
+    dependent and must never be presented as measurements.
     """
     r = float(radius_earth)
     if r < 1.5:
         rho_cgs = 2.43 + 3.39 * r
         mass = (rho_cgs / RHO_EARTH_CGS) * r**3
-        # Propagate the density-branch scatter conservatively: the paper does not
-        # quote an RMS for this branch, so we use the power-law branch RMS scaled
-        # by the mass, which is deliberately pessimistic for small planets.
+        # The paper quotes NO scatter for this branch. The uncertainty below is an
+        # ASSUMPTION of this project (50% of the mass, at least 0.5 M_earth), recorded as
+        # such in the dataset ("uncertainty_basis"); it is not a published number.
         unc = max(0.5 * mass, 0.5)
         branch = "density (R < 1.5 R_earth)"
     elif r <= 4.0:
@@ -268,7 +270,7 @@ def main() -> None:
                 "status": "observed",
                 "method": "dynamical mass from transit timing variations",
                 "source": "LIANG_ET_AL__2021",
-                "notes": "Independently corroborated by Shaw et al. 2025.",
+                "notes": "Shaw et al. 2025 lists identical central values (with larger uncertainties); the archive record does not show whether that is an independent determination, so it is treated as consistent, not as independent confirmation.",
             }
             if shaw is not None and pd.notna(shaw["pl_bmasse"]):
                 mass_rec["cross_check"] = {
@@ -278,6 +280,7 @@ def main() -> None:
                 }
         else:
             mval, munc, branch = weiss_marcy_2014_mass(radius_earth)
+            published_scatter = radius_earth >= 1.5
             mass_rec = {
                 "value": mval,
                 "uncertainty": munc,
@@ -285,10 +288,15 @@ def main() -> None:
                 "status": "derived",
                 "method": f"Weiss & Marcy (2014) mass-radius relation, {branch}",
                 "source": "WEISS__AMP__MARCY_2014",
+                "uncertainty_basis": (
+                    "published RMS of masses about the fit (Weiss & Marcy 2014)"
+                    if published_scatter
+                    else "ASSUMED by this project: 50% of the mass, floor 0.5 M_earth; the "
+                    "paper quotes no scatter for R < 1.5 R_earth"
+                ),
                 "notes": (
                     "NO PUBLISHED MASS EXISTS for this planet. This value is model-dependent "
-                    "with large intrinsic scatter (published RMS 4.3 M_earth, reduced chi^2 6.2) "
-                    "and must never be presented as a measurement."
+                    "with large intrinsic scatter and must never be presented as a measurement."
                 ),
             }
 
@@ -420,6 +428,29 @@ def main() -> None:
     kepler_ok = max_rel < 1e-3
     report.append(f"  VERDICT: {'PASS' if kepler_ok else 'FAIL'} (tolerance 1e-3)")
 
+    # The 1.26e-5 offset above is uniform in a, so it is a convention difference, not a
+    # measurement difference. Identify it: the catalogue equals (M* P_yr^2)^(1/3).
+    report.append("")
+    report.append("CHECK 1b - origin of the uniform offset: catalogue a vs (M* P_yr^2)^(1/3)")
+    worst_shortcut = 0.0
+    for letter in PLANETS:
+        p = planets_out[letter]
+        a_shortcut = (m_star * (p["orbital_period_days"]["value"] * DAY / YEAR_JULIAN) ** 2) ** (1.0 / 3.0)
+        rel_s = abs(a_shortcut - p["semi_major_axis_au"]["value"]) / p["semi_major_axis_au"]["value"]
+        worst_shortcut = max(worst_shortcut, rel_s)
+        p["semi_major_axis_au"]["shortcut_reproduction_rel_diff"] = rel_s
+    report.append(f"  max relative difference over 8 planets: {worst_shortcut:.1e}")
+    report.append(
+        "  => the catalogue used G M_sun = 4 pi^2 au^3/yr^2 with the STELLAR MASS ALONE. The"
+    )
+    report.append(
+        "     1.26e-5 offset in CHECK 1 is that shortcut's error (a factor 3 smaller than its"
+    )
+    report.append(
+        "     3.78e-5 error in GM, since a ~ GM^(1/3)). It is a convention difference, not a"
+    )
+    report.append("     disagreement about the system. See docs/UNITS.md.")
+
     report.append("")
     report.append("CHECK 2 - cross-source period discrepancies (adopted = Weiss et al. 2024)")
     report.append(
@@ -541,6 +572,49 @@ def main() -> None:
             float(i_from_b) if i_from_b is not None else None
         )
         p["impact_parameter"]["consistency_with_published_inclination"] = status
+
+    report.append("")
+    report.append("CHECK 6 - every published mass for the two giant planets (g, h)")
+    report.append(
+        "  The adopted masses are the TTV dynamical masses of Liang 2021 (Shaw 2025 lists the same central values)."
+    )
+    report.append(
+        f"{'planet':>7} {'source':>22} {'mass [M_earth]':>15} {'error':>9} {'method flag':>12}"
+    )
+    mass_records = {}
+    for letter in ("g", "h"):
+        mass_records[letter] = []
+        for ref_key in ("LIANG_ET_AL__2021", "SHAW_ET_AL__2025",
+                        "WEISS_ET_AL__2024", "SANTERNE_ET_AL__2016"):
+            row = pick(ref_key, letter)
+            if row is None or pd.isna(row["pl_bmasse"]):
+                continue
+            err = float(row["pl_bmasseerr1"]) if pd.notna(row["pl_bmasseerr1"]) else None
+            flag = str(row["pl_bmassprov"])
+            mass_records[letter].append(
+                {"source": ref_key, "mass_earth": float(row["pl_bmasse"]),
+                 "uncertainty_earth": err, "archive_flag": flag}
+            )
+            report.append(
+                f"{letter:>7} {ref_key:>22} {float(row['pl_bmasse']):15.2f} "
+                f"{('%.2f' % err) if err is not None else 'none':>9} {flag:>12}"
+            )
+        ttv = next(r for r in mass_records[letter] if r["source"] == "LIANG_ET_AL__2021")
+        others = [r for r in mass_records[letter] if r["source"] != "LIANG_ET_AL__2021"]
+        ratios = ", ".join(f"{r['source'].split('_')[0]} x{r['mass_earth'] / ttv['mass_earth']:.2f}"
+                           for r in others)
+        report.append(f"        ratio to the adopted TTV mass: {ratios}")
+    planets_out["g"]["mass_earth"]["all_published_masses"] = mass_records["g"]
+    planets_out["h"]["mass_earth"]["all_published_masses"] = mass_records["h"]
+    report.append(
+        "  Weiss 2024 gives M sin i with large errors and is compatible with the TTV masses within"
+    )
+    report.append(
+        "  ~1 sigma. Santerne 2016 (A&A 587, A64, a population study of giant planets) is listed"
+    )
+    report.append(
+        "  with round values and no uncertainty; it is NOT adopted."
+    )
 
     # =====================================================================
     # OUTPUTS
@@ -678,7 +752,7 @@ def main() -> None:
         md.append(f"| {k} | {BIB[src]['citation'].split(' — ')[0]} | `{status}` | {why} |")
     md += [
         f"| mass (g, h) | {BIB['LIANG_ET_AL__2021']['citation'].split(' — ')[0]} | `observed` | "
-        "Dynamical masses from transit timing variations; corroborated by Shaw et al. 2025. |",
+        "Dynamical masses from transit timing variations; Shaw et al. 2025 lists the same central values. |",
         f"| mass (b, c, i, d, e, f) | {BIB['WEISS__AMP__MARCY_2014']['citation'].split(' — ')[0]} "
         "| `derived` | **No published mass exists.** Derived from radius; large intrinsic scatter. |",
         "",
@@ -705,6 +779,15 @@ def main() -> None:
         "6. **Weiss & Marcy (2014) was calibrated on planets with P < 100 d.** Planet f "
         "(P = 124.9 d) lies slightly outside that calibration range in period, though well "
         "inside it in radius.",
+        "7. **The catalogue's semi-major axes embed a convention** (CHECK 1b): they equal "
+        "(M★ P²/yr²)^(1/3) with the stellar mass alone, i.e. the 4π² au³/yr² shortcut and no "
+        "planet mass. This project therefore derives `a` from the measured period and the "
+        "*total* mass with its own G instead of reading the catalogue value.",
+        "8. **Published masses of g and h disagree** (CHECK 6). The TTV masses (Liang 2021; "
+        "Shaw 2025) agree with each other and with Weiss 2024 within its large errors. The "
+        "Santerne 2016 entries are round values with no uncertainty and are not adopted. The "
+        "real system's masses of g and h are therefore *measured by transit timing*, but not "
+        "uniquely — other analyses disagree.",
     ]
     (ROOT / "docs" / "KEPLER90_DATA.md").write_text("\n".join(md), encoding="utf-8")
 

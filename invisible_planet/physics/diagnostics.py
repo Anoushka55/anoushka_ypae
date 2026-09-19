@@ -108,3 +108,22 @@ def summarise_element_evolution(history: dict[str, np.ndarray]) -> dict[str, flo
         out[f"{name}_trend_per_sample"] = slope
         out[f"{name}_trend_over_run"] = slope * len(series)
     return out
+
+
+def semi_major_axis_and_eccentricity(mu, r, v):
+    """Vectorised osculating semi-major axis and eccentricity from relative state vectors.
+
+    `r`, `v` have shape (..., 3) and `mu` broadcasts against the leading dimensions. Uses
+    the vis-viva energy for a and the eccentricity vector for e, exactly as
+    `physics.kepler.state_to_elements` does for a single body. Returns (a, e); a is negative
+    for an unbound orbit, which callers must treat as a failure.
+    """
+    r = np.asarray(r, dtype=np.float64)
+    v = np.asarray(v, dtype=np.float64)
+    rn = np.linalg.norm(r, axis=-1)
+    v2 = np.sum(v * v, axis=-1)
+    energy = 0.5 * v2 - mu / rn
+    a = -mu / (2.0 * energy)
+    h = np.cross(r, v)
+    e_vec = np.cross(v, h) / np.asarray(mu)[..., None] - r / rn[..., None]
+    return a, np.linalg.norm(e_vec, axis=-1)
